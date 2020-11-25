@@ -15,14 +15,12 @@ const Controller = {
     ev.preventDefault();
     const form = document.getElementById("form");
     const data = Object.fromEntries(new FormData(form));
-    const response = fetch(`http://localhost:3001/search?q=${data.query}`).then(
-      (response) => {
-        response.json().then((results) => {
-          console.log(results);
-          Controller.updateTable(results);
-        });
-      }
-    );
+    const response = fetch(`/search?q=${data.query}`).then((response) => {
+      response.json().then((results) => {
+        console.log(results);
+        Controller.updateTable(results);
+      });
+    });
   },
 
   updateTable: (results) => {
