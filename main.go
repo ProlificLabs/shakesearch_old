@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 )
 
 func main() {
@@ -23,8 +24,13 @@ func main() {
 
 	http.HandleFunc("/search", handleSearch(searcher))
 
-	log.Println("Listening on :3001...")
-	err = http.ListenAndServe(":3001", nil)
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "3001"
+	}
+
+	fmt.Printf("Listening on port %s...", port)
+	err = http.ListenAndServe(fmt.Sprintf(":%s", port), nil)
 	if err != nil {
 		log.Fatal(err)
 	}
