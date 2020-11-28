@@ -21,3 +21,5 @@ To submit your solution, please deploy your app and send us a link to the live
 demo along with a zip file containing the source code. The project includes a
 Heroku Procfile and, in its current state, can be deployed easily on Heroku's
 free tier.
+
+If you are stronger on the front-end, complete the react-prompt.md in this folder. 
