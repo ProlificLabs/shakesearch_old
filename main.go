@@ -17,6 +17,17 @@ import (
 	"golang.org/x/sync/semaphore"
 )
 
+const (
+	maxNumberOfThreads      = 10
+	paragraphSize           = 500
+	subseqFragmentationSize = 3
+)
+
+type returnStruct struct {
+	Positions []int  `json:"positions"`
+	Text      string `json:"text"`
+}
+
 func main() {
 	searcher := Searcher{}
 	err := searcher.Load("completeworks.txt")
@@ -44,6 +55,7 @@ func main() {
 type Searcher struct {
 	CompleteWorks string
 	SuffixArray   *suffixarray.Index
+	Occurrences   map[string]map[int]bool
 }
 
 func handleSearch(searcher Searcher) func(w http.ResponseWriter, r *http.Request) {
@@ -54,7 +66,7 @@ func handleSearch(searcher Searcher) func(w http.ResponseWriter, r *http.Request
 			w.Write([]byte("missing search query in URL params"))
 			return
 		}
-		results := searcher.Search(query[0])
+		results := searcher.Search(query[0], false, 2)
 		buf := &bytes.Buffer{}
 		enc := json.NewEncoder(buf)
 
@@ -76,22 +88,91 @@ func (s *Searcher) Load(filename string) error {
 	if err != nil {
 		return fmt.Errorf("Load: %w", err)
 	}
+	asLowerCase := strings.ToLower(string(dat))
+
 	s.CompleteWorks = string(dat)
-	s.SuffixArray = suffixarray.New([]byte(strings.ToLower(string(dat))))
+	s.SuffixArray = suffixarray.New([]byte(asLowerCase))
+
+	s.Occurrences = make(map[string]map[int]bool)
+
+	for i := 0; i < len(asLowerCase)-subseqFragmentationSize; i++ {
+		if _, ok := s.Occurrences[asLowerCase[i:i+subseqFragmentationSize]]; !ok {
+			s.Occurrences[asLowerCase[i:i+subseqFragmentationSize]] = make(map[int]bool)
+		}
+		s.Occurrences[asLowerCase[i:i+subseqFragmentationSize]][i] = true
+	}
+
 	return nil
 }
 
-func (s *Searcher) Search(query string) []*returnStruct {
-	idxs := s.SuffixArray.Lookup([]byte(strings.ToLower(query)), -1)
+// Fault-tolerant merge of continuous interval into one lower bound position
+func mergePositions(positions []int, maxMismatches, minLength int) []int {
+	sort.SliceStable(positions, func(i, j int) bool { return positions[i] < positions[j] })
+
+	result := []int{}
+
+	continuousPositions := []int{}
+
+	lastPos := 0
+	for _, pos := range positions {
+		if (len(continuousPositions) > 0) && (pos-lastPos >= maxMismatches) {
+			// split found
+			if continuousPositions[len(continuousPositions)-1]+subseqFragmentationSize-continuousPositions[0] >= minLength { // ensure minimum length is met
+				result = append(result, continuousPositions[0])
+			}
+			continuousPositions = []int{}
+		}
+		continuousPositions = append(continuousPositions, pos)
+		lastPos = pos
+	}
+
+	if len(continuousPositions) > 0 {
+		result = append(result, continuousPositions[0])
+	}
+
+	return result
+
+}
+
+// Search(query string, exact bool)
+// query: word to match for
+// exact: match exact word or similar words
+// maxMismatches: number of mismatches allowed (requires exact = false)
+// Description: Fault-tolerant substring search.
+// Author: Lemmer EL ASSAL
+func (s *Searcher) Search(query string, exact bool, maxMismatches int) []*returnStruct {
+
+	query = strings.ToLower(query)
+
+	idxs := []int{}
+
+	if exact {
+		idxs = s.SuffixArray.Lookup([]byte(strings.ToLower(query)), -1)
+	} else {
+
+		uniqueSubsequences := make(map[string]bool)
+		for i := 0; i < len(query)-subseqFragmentationSize+1; i++ {
+			uniqueSubsequences[query[i:i+subseqFragmentationSize]] = true
+		}
+
+		for sub := range uniqueSubsequences {
+			for pos := range s.Occurrences[sub] {
+				idxs = append(idxs, pos)
+			}
+		}
+
+		idxs = mergePositions(idxs, maxMismatches, len(query)-maxMismatches)
+	}
+
 	results := []*returnStruct{}
 
 	// Index to compact result
 	lowerBounds := make(map[int]map[int]bool)
 
 	for _, idx := range idxs {
-		// Divide into blocks of 500 characters
+		// Divide into blocks of paragraphSize characters
 
-		lb := (idx / 250) * 250
+		lb := (idx / paragraphSize) * paragraphSize
 		if _, ok := lowerBounds[lb]; !ok {
 			lowerBounds[lb] = make(map[int]bool)
 		}
@@ -100,7 +181,7 @@ func (s *Searcher) Search(query string) []*returnStruct {
 
 	mut := &sync.Mutex{}
 	wg := &sync.WaitGroup{}
-	sem := semaphore.NewWeighted(10) // don't spawn too many threads
+	sem := semaphore.NewWeighted(maxNumberOfThreads) // limit number of threads spawned
 
 	for lb, positionsMap := range lowerBounds {
 		wg.Add(1)
@@ -114,11 +195,17 @@ func (s *Searcher) Search(query string) []*returnStruct {
 			}
 			sort.SliceStable(positions, func(i, j int) bool { return positions[i] < positions[j] })
 
+			ub := lb + paragraphSize
+			if ub > len(s.CompleteWorks) {
+				ub = len(s.CompleteWorks)
+			}
+
 			mut.Lock()
-			results = append(results, &returnStruct{Text: s.CompleteWorks[lb : lb+500], Positions: positions})
+			results = append(results, &returnStruct{Text: s.CompleteWorks[lb:ub], Positions: positions})
 			mut.Unlock()
+			sem.Release(1) // Alternatively: parallel threads with data- and "done" channel - Lemmer
+
 			wg.Done()
-			sem.Release(1)
 
 		}(lb, positionsMap)
 
@@ -127,9 +214,4 @@ func (s *Searcher) Search(query string) []*returnStruct {
 	wg.Wait()
 
 	return results
-}
-
-type returnStruct struct {
-	Positions []int  `json:"positions"`
-	Text      string `json:"text"`
 }
