@@ -14,4 +14,4 @@ In it's current state, however, the app is just a rough prototype and the design
 
 Improve the design and build the following:
 ![Search GIF](shakespearetest.gif)
-Here are the links to the [design](https://www.figma.com/file/Q0VfmCutWFayWMDtoLEW0Q/InvestorBook-iterations?node-id=0%3A1). Match the designs closely in your implementation
+Here are the links to the [design](https://www.figma.com/file/SutAvaJCNTeCSGHajrDyme/Shakesearch). Match the designs closely in your implementation
