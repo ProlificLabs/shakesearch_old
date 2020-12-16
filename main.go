@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"index/suffixarray"
@@ -9,7 +10,11 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"sort"
 	"strings"
+	"sync"
+
+	"golang.org/x/sync/semaphore"
 )
 
 func main() {
@@ -52,12 +57,15 @@ func handleSearch(searcher Searcher) func(w http.ResponseWriter, r *http.Request
 		results := searcher.Search(query[0])
 		buf := &bytes.Buffer{}
 		enc := json.NewEncoder(buf)
+
 		err := enc.Encode(results)
+
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte("encoding failure"))
 			return
 		}
+
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(buf.Bytes())
 	}
@@ -73,11 +81,55 @@ func (s *Searcher) Load(filename string) error {
 	return nil
 }
 
-func (s *Searcher) Search(query string) []string {
+func (s *Searcher) Search(query string) []*returnStruct {
 	idxs := s.SuffixArray.Lookup([]byte(strings.ToLower(query)), -1)
-	results := []string{}
+	results := []*returnStruct{}
+
+	// Index to compact result
+	lowerBounds := make(map[int]map[int]bool)
+
 	for _, idx := range idxs {
-		results = append(results, s.CompleteWorks[idx-250:idx+250])
+		// Divide into blocks of 500 characters
+
+		lb := (idx / 250) * 250
+		if _, ok := lowerBounds[lb]; !ok {
+			lowerBounds[lb] = make(map[int]bool)
+		}
+		lowerBounds[lb][idx-lb] = true
 	}
+
+	mut := &sync.Mutex{}
+	wg := &sync.WaitGroup{}
+	sem := semaphore.NewWeighted(10) // don't spawn too many threads
+
+	for lb, positionsMap := range lowerBounds {
+		wg.Add(1)
+		sem.Acquire(context.Background(), 1)
+
+		go func(lb int, positionsMap map[int]bool) {
+
+			positions := []int{}
+			for k := range positionsMap {
+				positions = append(positions, k)
+			}
+			sort.SliceStable(positions, func(i, j int) bool { return positions[i] < positions[j] })
+
+			mut.Lock()
+			results = append(results, &returnStruct{Text: s.CompleteWorks[lb : lb+500], Positions: positions})
+			mut.Unlock()
+			wg.Done()
+			sem.Release(1)
+
+		}(lb, positionsMap)
+
+	}
+
+	wg.Wait()
+
 	return results
+}
+
+type returnStruct struct {
+	Positions []int  `json:"positions"`
+	Text      string `json:"text"`
 }
