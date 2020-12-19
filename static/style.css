@@ -259,4 +259,34 @@ textarea {
   h3 {
     page-break-after: avoid;
   }
+
+}
+
+/*new styling*/
+#title{
+  position:relative;
+  left:20px;
+  top:20px;
+  color:#2d2d2d;
+  font-size: 1.5em;
+}
+
+body {
+  font-family: system-ui;
+  background: #e5e5e5;
+  color: #000;
+  text-align: left;
+}
+
+.result > div{background:#fff;padding:10px; border-radius:10px;margin:5px 0;clear:both;transition: 0.3s;}
+.result div:hover{transition: height 0.2s;min-height:10px;overflow: hidden}
+
+span.hide{
+  display: none;
+}
+
+.result div a {color:red;clear:both;margin-bottom:10px;cursor:pointer}
+
+#query{
+  width: 350px;
 }
