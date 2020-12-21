@@ -23,21 +23,21 @@ func main() {
 	suffixarraySearcher := searcher.NewSuffixArraySearcher(dat)
 	handler := NewHandler(suffixarraySearcher)
 
-	fs := http.FileServer(http.Dir("./static"))
-	http.Handle("/", fs)
-
-	http.HandleFunc("/search", handler.Search)
-
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "3001"
 	}
 
-	fmt.Printf("Listening on port %s...", port)
-	err = http.ListenAndServe(fmt.Sprintf(":%s", port), nil)
-	if err != nil {
-		log.Fatal(err)
-	}
+	mux := http.NewServeMux()
+
+	fs := http.FileServer(http.Dir("./static"))
+
+	mux.Handle("/", fs)
+	mux.HandleFunc("/search", handler.Search)
+
+	fmt.Printf("Listening on port %s...\n", port)
+
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", port), mux))
 }
 
 type Handler struct {
