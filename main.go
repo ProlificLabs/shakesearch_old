@@ -1,8 +1,6 @@
 package main
 
 import (
-	"bytes"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -12,6 +10,7 @@ import (
 	"strconv"
 	"strings"
 
+	"pulley.com/shakesearch/pkg/render"
 	"pulley.com/shakesearch/pkg/searcher"
 )
 
@@ -22,11 +21,12 @@ func main() {
 	}
 
 	suffixarraySearcher := searcher.NewSuffixArraySearcher(dat)
+	jsonRender := render.NewJsonRender()
 
 	fs := http.FileServer(http.Dir("./static"))
 	http.Handle("/", fs)
 
-	http.HandleFunc("/search", handleSearch(suffixarraySearcher))
+	http.HandleFunc("/search", handleSearch(suffixarraySearcher, jsonRender))
 
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -40,19 +40,17 @@ func main() {
 	}
 }
 
-func handleSearch(s searcher.Searcher) func(w http.ResponseWriter, r *http.Request) {
+func handleSearch(s searcher.Searcher, rend render.Render) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		query, ok := r.URL.Query()["q"]
 		if !ok || len(query[0]) < 1 {
-			w.WriteHeader(http.StatusBadRequest)
-			w.Write([]byte("missing search query in URL params"))
+			rend.Error(w, http.StatusBadGateway, "missing search query in URL params")
 			return
 		}
 
 		searchRequest := SearchRequest{}
 		if err := searchRequest.Bind(r); err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			w.Write([]byte(err.Error()))
+			rend.Error(w, http.StatusBadRequest, err)
 			return
 		}
 
@@ -68,20 +66,11 @@ func handleSearch(s searcher.Searcher) func(w http.ResponseWriter, r *http.Reque
 
 		res, err := s.Search(req)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(http.StatusText(http.StatusUnauthorized)))
+			rend.Error(w, http.StatusBadRequest, err)
 			return
 		}
 
-		buf := &bytes.Buffer{}
-		enc := json.NewEncoder(buf)
-		if err := enc.Encode(res); err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte("encoding failure"))
-			return
-		}
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(buf.Bytes())
+		rend.Success(w, res)
 	}
 }
 
