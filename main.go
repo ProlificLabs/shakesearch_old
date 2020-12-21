@@ -3,25 +3,30 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
-	"index/suffixarray"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+	"strconv"
+	"strings"
+
+	"pulley.com/shakesearch/pkg/searcher"
 )
 
 func main() {
-	searcher := Searcher{}
-	err := searcher.Load("completeworks.txt")
+	dat, err := ioutil.ReadFile("./completeworks.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	suffixarraySearcher := searcher.NewSuffixArraySearcher(dat)
+
 	fs := http.FileServer(http.Dir("./static"))
 	http.Handle("/", fs)
 
-	http.HandleFunc("/search", handleSearch(searcher))
+	http.HandleFunc("/search", handleSearch(suffixarraySearcher))
 
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -35,12 +40,7 @@ func main() {
 	}
 }
 
-type Searcher struct {
-	CompleteWorks string
-	SuffixArray   *suffixarray.Index
-}
-
-func handleSearch(searcher Searcher) func(w http.ResponseWriter, r *http.Request) {
+func handleSearch(s searcher.Searcher) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		query, ok := r.URL.Query()["q"]
 		if !ok || len(query[0]) < 1 {
@@ -48,11 +48,34 @@ func handleSearch(searcher Searcher) func(w http.ResponseWriter, r *http.Request
 			w.Write([]byte("missing search query in URL params"))
 			return
 		}
-		results := searcher.Search(query[0])
+
+		searchRequest := SearchRequest{}
+		if err := searchRequest.Bind(r); err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(err.Error()))
+			return
+		}
+
+		req := searcher.Request{
+			Query:            searchRequest.Q,
+			CaseSensitive:    searchRequest.Sensitive,
+			ExactMatch:       searchRequest.ExactMatch,
+			CharBeforeQuery:  searchRequest.Before,
+			CharAfterQuery:   searchRequest.After,
+			HighlightPreTag:  "<em>",
+			HighlightPostTag: "</em>",
+		}
+
+		res, err := s.Search(req)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(http.StatusText(http.StatusUnauthorized)))
+			return
+		}
+
 		buf := &bytes.Buffer{}
 		enc := json.NewEncoder(buf)
-		err := enc.Encode(results)
-		if err != nil {
+		if err := enc.Encode(res); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte("encoding failure"))
 			return
@@ -62,21 +85,57 @@ func handleSearch(searcher Searcher) func(w http.ResponseWriter, r *http.Request
 	}
 }
 
-func (s *Searcher) Load(filename string) error {
-	dat, err := ioutil.ReadFile(filename)
-	if err != nil {
-		return fmt.Errorf("Load: %w", err)
-	}
-	s.CompleteWorks = string(dat)
-	s.SuffixArray = suffixarray.New(dat)
-	return nil
+type SearchRequest struct {
+	Q          string
+	Sensitive  bool
+	ExactMatch bool
+	Before     int
+	After      int
 }
 
-func (s *Searcher) Search(query string) []string {
-	idxs := s.SuffixArray.Lookup([]byte(query), -1)
-	results := []string{}
-	for _, idx := range idxs {
-		results = append(results, s.CompleteWorks[idx-250:idx+250])
+func (sr *SearchRequest) Bind(r *http.Request) error {
+	const (
+		defaultSensitive = false
+		defaultBefore    = 215
+		defaultAfter     = 215
+	)
+
+	query := r.URL.Query()
+
+	q := query.Get("q")
+	if q == "" {
+		return errors.New("missing search query in URL params")
 	}
-	return results
+
+	if strings.HasPrefix(q, `"`) && strings.HasSuffix(q, `"`) {
+		sr.ExactMatch = true
+		q = strings.TrimPrefix(q, `"`)
+		q = strings.TrimSuffix(q, `"`)
+	}
+
+	sr.Q = q
+
+	sensitive, err := strconv.ParseBool(query.Get("sensitive"))
+	if err != nil {
+		sr.Sensitive = defaultSensitive
+	} else {
+		sr.Sensitive = sensitive
+	}
+
+	before, err := strconv.Atoi(query.Get("before"))
+	if err != nil {
+		sr.Before = defaultBefore
+	} else {
+		sr.Before = before
+	}
+
+	after, err := strconv.Atoi(query.Get("after"))
+	if err != nil {
+		sr.After = defaultAfter
+	} else {
+		sr.After = after
+	}
+
+	return nil
+
 }

@@ -13,8 +13,10 @@ const Controller = {
   updateTable: (results) => {
     const table = document.getElementById("table-body");
     const rows = [];
-    for (let result of results) {
-      rows.push(`<tr>${result}<tr/>`);
+    if(results.highlights) {
+      for (let result of results.highlights) {
+        rows.push(`<tr>${result.text}<tr/><hr>`);
+      }
     }
     table.innerHTML = rows;
   },

@@ -260,3 +260,9 @@ textarea {
     page-break-after: avoid;
   }
 }
+
+/* highlight text */
+#table-body em {
+  color: red;
+}
+
