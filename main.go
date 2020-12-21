@@ -30,7 +30,7 @@ func main() {
 
 	mux := http.NewServeMux()
 
-	fs := http.FileServer(http.Dir("./static"))
+	fs := http.FileServer(http.Dir("./public"))
 
 	mux.Handle("/", fs)
 	mux.HandleFunc("/search", handler.Search)
