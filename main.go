@@ -15,7 +15,7 @@ import (
 )
 
 func main() {
-	dat, err := ioutil.ReadFile("./completeworks.txt")
+	dat, err := ioutil.ReadFile("./data/completeworks.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
