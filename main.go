@@ -42,6 +42,10 @@ func main() {
 
 func handleSearch(s searcher.Searcher, rend render.Render) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			render.Error(w, http.StatusMethodNotAllowed, http.StatusText(http.StatusMethodNotAllowed))
+			return
+		}
 
 		searchRequest := SearchRequest{}
 		if err := searchRequest.Bind(r); err != nil {
