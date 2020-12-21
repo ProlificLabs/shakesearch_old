@@ -21,12 +21,12 @@ func main() {
 	}
 
 	suffixarraySearcher := searcher.NewSuffixArraySearcher(dat)
-	jsonRender := render.NewJsonRender()
+	handler := NewHandler(suffixarraySearcher)
 
 	fs := http.FileServer(http.Dir("./static"))
 	http.Handle("/", fs)
 
-	http.HandleFunc("/search", handleSearch(suffixarraySearcher, jsonRender))
+	http.HandleFunc("/search", handler.Search)
 
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -40,37 +40,51 @@ func main() {
 	}
 }
 
-func handleSearch(s searcher.Searcher, rend render.Render) func(w http.ResponseWriter, r *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet {
-			render.Error(w, http.StatusMethodNotAllowed, http.StatusText(http.StatusMethodNotAllowed))
-			return
-		}
+type Handler struct {
+	Searcher searcher.Searcher
+	Render   render.Render
+}
 
-		searchRequest := SearchRequest{}
-		if err := searchRequest.Bind(r); err != nil {
-			rend.Error(w, http.StatusBadRequest, err)
-			return
-		}
-
-		req := searcher.Request{
-			Query:            searchRequest.Q,
-			CaseSensitive:    searchRequest.Sensitive,
-			ExactMatch:       searchRequest.ExactMatch,
-			CharBeforeQuery:  searchRequest.Before,
-			CharAfterQuery:   searchRequest.After,
-			HighlightPreTag:  "<em>",
-			HighlightPostTag: "</em>",
-		}
-
-		res, err := s.Search(req)
-		if err != nil {
-			rend.Error(w, http.StatusBadRequest, err)
-			return
-		}
-
-		rend.Success(w, res)
+func NewHandler(s searcher.Searcher) *Handler {
+	return &Handler{
+		Searcher: s,
+		Render:   render.NewJsonRender(),
 	}
+}
+
+func (h Handler) ChangerRender(r render.Render) {
+	h.Render = r
+}
+
+func (h *Handler) Search(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		h.Render.Error(w, http.StatusMethodNotAllowed, http.StatusText(http.StatusMethodNotAllowed))
+		return
+	}
+
+	searchRequest := SearchRequest{}
+	if err := searchRequest.Bind(r); err != nil {
+		h.Render.Error(w, http.StatusBadRequest, err)
+		return
+	}
+
+	req := searcher.Request{
+		Query:            searchRequest.Q,
+		CaseSensitive:    searchRequest.Sensitive,
+		ExactMatch:       searchRequest.ExactMatch,
+		CharBeforeQuery:  searchRequest.Before,
+		CharAfterQuery:   searchRequest.After,
+		HighlightPreTag:  "<em>",
+		HighlightPostTag: "</em>",
+	}
+
+	res, err := h.Searcher.Search(req)
+	if err != nil {
+		h.Render.Error(w, http.StatusBadRequest, err)
+		return
+	}
+
+	h.Render.Success(w, res)
 }
 
 type SearchRequest struct {
