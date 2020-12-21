@@ -29,7 +29,7 @@ function App() {
       const response = await fetch(`/search?q=${value}`)
       if(response.status !== 200) throw new Error(`Error ${response.status}`)
       const results = await response.json()
-      if(!results.highlights && results.highlights.length === 0) setEmpty(true)
+      if(!results.highlights) setEmpty(true)
       if(results.highlights) {
         setData(results.highlights)
       }
