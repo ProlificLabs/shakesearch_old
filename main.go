@@ -42,11 +42,6 @@ func main() {
 
 func handleSearch(s searcher.Searcher, rend render.Render) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		query, ok := r.URL.Query()["q"]
-		if !ok || len(query[0]) < 1 {
-			rend.Error(w, http.StatusBadGateway, "missing search query in URL params")
-			return
-		}
 
 		searchRequest := SearchRequest{}
 		if err := searchRequest.Bind(r); err != nil {
