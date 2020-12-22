@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 )
 
 func main() {
@@ -35,6 +36,7 @@ func main() {
 	}
 }
 
+// Searcher allows for keyword search in the complete works of Shakespare.
 type Searcher struct {
 	CompleteWorks string
 	SuffixArray   *suffixarray.Index
@@ -62,18 +64,23 @@ func handleSearch(searcher Searcher) func(w http.ResponseWriter, r *http.Request
 	}
 }
 
+// Load pulls data from a file and puts the contents into a suffixarray.SuffixArray for quick keyword search.
 func (s *Searcher) Load(filename string) error {
 	dat, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return fmt.Errorf("Load: %w", err)
 	}
 	s.CompleteWorks = string(dat)
-	s.SuffixArray = suffixarray.New(dat)
+	// Store the data as lowercase in the suffix array.
+	dataSource := strings.ToLower(string(dat))
+	s.SuffixArray = suffixarray.New([]byte(dataSource))
 	return nil
 }
 
+// Search looks up a string in our data store in memory.
+// Searches are case insensitive.
 func (s *Searcher) Search(query string) []string {
-	idxs := s.SuffixArray.Lookup([]byte(query), -1)
+	idxs := s.SuffixArray.Lookup([]byte(strings.ToLower(query)), -1)
 	results := []string{}
 	for _, idx := range idxs {
 		results = append(results, s.CompleteWorks[idx-250:idx+250])
