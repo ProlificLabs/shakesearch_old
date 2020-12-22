@@ -70,9 +70,13 @@ func (s *Searcher) Load(filename string) error {
 	if err != nil {
 		return fmt.Errorf("Load: %w", err)
 	}
-	s.CompleteWorks = string(dat)
+
+	// This will be in a browser, store with linebreaks to make it easier to read.
+	body := strings.Replace(string(dat), "\r\n", "<br>", -1)
+	s.CompleteWorks = body
+
 	// Store the data as lowercase in the suffix array.
-	dataSource := strings.ToLower(string(dat))
+	dataSource := strings.ToLower(body)
 	s.SuffixArray = suffixarray.New([]byte(dataSource))
 	return nil
 }
