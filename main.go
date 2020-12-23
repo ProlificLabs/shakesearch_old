@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
     "regexp"
+    "unicode"
 )
 
 func main() {
@@ -74,11 +75,23 @@ func (s *Searcher) Load(filename string) error {
 }
 
 func (s *Searcher) Search(query string) []string {
+    if !s.ContainsUpper(query) {
+        query = "(?i)" + query
+    }
     reg := regexp.MustCompile(query)
 	idxs := s.SuffixArray.FindAllIndex(reg, -1)
 	results := []string{}
 	for _, idx := range idxs {
-		results = append(results, s.CompleteWorks[idx[0]:idx[1]])
+		results = append(results, s.CompleteWorks[idx[0]-250:idx[1]+250])
 	}
 	return results
+}
+
+func (s *Searcher) ContainsUpper(str string) bool {
+    for _,r := range str {
+        if !unicode.IsUpper(r) && unicode.IsLetter(r) {
+            return false
+        }
+    }
+    return true
 }
