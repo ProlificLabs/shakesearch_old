@@ -3,25 +3,14 @@
 Welcome to the Pulley Shakesearch Take-home Challenge! In this repository,
 you'll find a simple web app that allows a user to search for a text string in
 the complete works of Shakespeare.
+You can browse a live instance at [https://jcw-shakesearch.herokuapp.com/](https://jcw-shakesearch.herokuapp.com/).
+If I had more time, I'd used a [Bag of Words model](https://en.wikipedia.org/wiki/Bag-of-words_model) to find results even if users misspell words.
 
-You can see a live version of the app at
-https://pulley-shakesearch.herokuapp.com/. Try searching for "Hamlet" to display
-a set of results.
+# Improvements
+* I stored the index as lowercase and lowercased all queries to enable case insensitive search.
 
-In it's current state, however, the app is just a rough prototype. The search is
-case sensitive, the results are difficult to read, and the search is limited to
-exact matches.
+* I replaced the carriage returns in the text in memory (`\r\n`) with HTML line breaks (`<br>`) to make the page more pleasant to read, since the app is in a browser.
 
-## Your Mission
-
-Improve the search backend. Think about the problem from the user's perspective
-and prioritize your changes according to what you think is most useful.
-
-## Submission
-
-1. Fork this repository and send us a link to your fork after pushing your changes. 
-2. Heroku hosting - The project includes a Heroku Procfile and, in its
-current state, can be deployed easily on Heroku's free tier.
-3. In your submission, share with us what changes you made and how you would prioritize changes if you had more time.
+* I trimmed leading sentence fragments to make it easier to read the search results.
 
 

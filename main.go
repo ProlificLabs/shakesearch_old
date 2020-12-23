@@ -12,6 +12,15 @@ import (
 	"strings"
 )
 
+var (
+	endOfSentence = []string{
+		".",
+		"?",
+		"!",
+		"\"",
+	}
+)
+
 func main() {
 	searcher := Searcher{}
 	err := searcher.Load("completeworks.txt")
@@ -87,7 +96,72 @@ func (s *Searcher) Search(query string) []string {
 	idxs := s.SuffixArray.Lookup([]byte(strings.ToLower(query)), -1)
 	results := []string{}
 	for _, idx := range idxs {
-		results = append(results, s.CompleteWorks[idx-250:idx+250])
+		result := removeSentenceFragments(s.CompleteWorks[idx-250 : idx+250])
+		// Don't put empty results in the search
+		if result == "" {
+			continue
+		}
+		results = append(results, result)
 	}
 	return results
+}
+
+// min finds the lowest number in a list of numbers.
+// it will return 0 given an empty list
+func min(numbers []int) int {
+	if len(numbers) == 0 {
+		return 0
+	}
+
+	if len(numbers) == 1 {
+		return numbers[0]
+	}
+
+	smallest := numbers[0]
+	for _, number := range numbers[1:] {
+		if smallest < number {
+			smallest = number
+		}
+	}
+	return smallest
+}
+
+func max(numbers []int) int {
+	if len(numbers) == 0 {
+		return 0
+	}
+
+	if len(numbers) == 1 {
+		return numbers[0]
+	}
+
+	largest := numbers[0]
+	for _, number := range numbers[1:] {
+		if largest > number {
+			largest = number
+		}
+	}
+	return largest
+}
+
+// removeSentenceFragments removes sentence fragments
+func removeSentenceFragments(text string) string {
+	if text == "" {
+		return text
+	}
+
+	var firstSentenceEnds []int
+	for _, character := range endOfSentence {
+		firstSentenceIndex := strings.Index(text, character)
+		// Prevent not found from messing with the min.
+		if firstSentenceIndex == -1 {
+			firstSentenceIndex = 0
+		}
+		firstSentenceEnds = append(firstSentenceEnds, firstSentenceIndex)
+	}
+
+	// The first sentence ends right after its punctuation.
+	firstSentenceEnd := min(firstSentenceEnds) + 1
+	text = text[firstSentenceEnd:]
+	return text
 }
