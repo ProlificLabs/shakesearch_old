@@ -89,9 +89,9 @@ func (s *Searcher) Search(query string) []string {
 
 func (s *Searcher) ContainsUpper(str string) bool {
     for _,r := range str {
-        if !unicode.IsUpper(r) && unicode.IsLetter(r) {
-            return false
+        if unicode.IsUpper(r) && unicode.IsLetter(r) {
+            return true
         }
     }
-    return true
+    return false
 }
