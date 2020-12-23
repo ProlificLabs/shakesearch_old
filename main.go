@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+    "regexp"
 )
 
 func main() {
@@ -73,10 +74,11 @@ func (s *Searcher) Load(filename string) error {
 }
 
 func (s *Searcher) Search(query string) []string {
-	idxs := s.SuffixArray.FindAllIndex([]byte(query), -1)
+    reg := regexp.MustCompile(query)
+	idxs := s.SuffixArray.FindAllIndex(reg, -1)
 	results := []string{}
 	for _, idx := range idxs {
-		results = append(results, s.CompleteWorks[idx-250:idx+250])
+		results = append(results, s.CompleteWorks[idx[0]:idx[1]])
 	}
 	return results
 }
