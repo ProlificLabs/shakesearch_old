@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+    "html/template"
 	"index/suffixarray"
 	"io/ioutil"
 	"log"
@@ -13,6 +14,16 @@ import (
     "strings"
     "unicode"
 )
+
+
+type Pair struct {
+    Name string
+    Value string
+}
+
+type Person struct {
+    Value string
+}
 
 func main() {
 	searcher := Searcher{}
@@ -24,6 +35,7 @@ func main() {
 	fs := http.FileServer(http.Dir("./static"))
 	http.Handle("/", fs)
 
+    http.HandleFunc("/view", handleDropdown(searcher))
 	http.HandleFunc("/search", handleSearch(searcher))
 
 	port := os.Getenv("PORT")
@@ -42,6 +54,22 @@ type Searcher struct {
     WorksTitles []string
 	CompleteWorks string
 	SuffixArray   *suffixarray.Index
+}
+
+func handleDropdown(searcher Searcher) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+        var fruits = map[string]interface{}{
+				 "Apple":  "apple",
+				 "Orange": "orange",
+				 "Pear":   "pear",
+				 "Grape":  "grape",
+			}
+        t, err := template.ParseFiles("static/index.html")
+        if err != nil {
+            panic(err)
+        }
+        t.Execute(w, fruits)
+    }
 }
 
 func handleSearch(searcher Searcher) func(w http.ResponseWriter, r *http.Request) {
@@ -82,17 +110,26 @@ func (s *Searcher) Load(titlefile string, bodyfile string) error {
 }
 
 func (s *Searcher) Search(query string) []string {
-    //filter := regexp.MustCompile("[^a-zA-Z0-9\s.!?;:\'\"\\-]+")
-    //query = filter.ReplaceAllString(query, "")
-    if !s.ContainsUpper(query) {
-        query = "(?i)" + query
-    }
-    reg := regexp.MustCompile(query)
-	idxs := s.SuffixArray.FindAllIndex(reg, -1)
-	results := []string{}
-    curr_idx := 0
-	for _, idx := range idxs {
-        if idx[0] >= curr_idx {
+    results := []string{}
+    if (query[0] == '"' && query[len(query)-1] == '"') {
+        idxs := s.SuffixArray.Lookup([]byte(query[1:len(query)-1]), -1)
+        for _, idx := range idxs {
+            lines := s.GetLines(idx)
+            results = append(results, lines)
+        }
+    } else {
+        query = regexp.QuoteMeta(query)
+        if !s.ContainsUpper(query) {
+            query = "(?i)" + query
+        }
+        if (query[len(query)-2:] == "ed") {
+            query = query[:len(query)-2] + "[e']d"
+        }
+
+        query = strings.ReplaceAll(query, " ", "[.!?'\"\\s\\[\\]\\(\\)-]")
+        reg := regexp.MustCompile(query)
+        idxs := s.SuffixArray.FindAllIndex(reg, -1)
+        for _, idx := range idxs {
             lines := s.GetLines(idx[0])
             results = append(results, lines)
         }
@@ -101,41 +138,18 @@ func (s *Searcher) Search(query string) []string {
 }
 
 func (s *Searcher) GetLines(idx int) string {
-    result := s.CompleteWorks[idx-150 : idx+150]
+    result := s.CompleteWorks[idx-100 : idx+100]
     lines := strings.Split(result, "\n")
     count := 0
     for i,line := range lines {
         count += len(line)
-        if count > 150 {
-            result = strings.Join(lines[i-1 : i+2],"")
+        if count > 100 {
+            result = strings.Join(lines[i-1 : i+2],"<br>")
+            break
         }
     }
-    result = strings.Join(lines[:],"")
-    result = strings.Replace(result, "\n", "<br>", -1)
     return result
 
-//    start, end := -1, -1
-//    sn, en := 0, 0
-//    for i := 0; start!=-1 && end!=-1 && i < 250; i++ {
-//        if string(s.CompleteWorks[idx-i]) == string("\n") {
-//            sn += 1
-//            if sn == 1 {
-//                start = idx-i+1
-//            }
-//        }
-//        if string(s.CompleteWorks[idx+i]) == string("\n") {
-//            en += 1
-//            if en == 1 {
-//                end = idx+i
-//            }
-//        }
-//    }
-//    if start == -1 || end == -1 {
-//        start,end = idx-100, idx+100
-//    }
-//    result := s.CompleteWorks[start : end]
-//    result = strings.Replace(result, "\n", "<br>", -1)
-//    return result, end
 }
 
 func (s *Searcher) ContainsUpper(str string) bool {

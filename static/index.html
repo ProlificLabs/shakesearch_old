@@ -10,6 +10,12 @@
 
 <body>
     <p>
+        <select>
+            <option value="ALL"> all </option>
+            {{range $key, $value := .Fruits}}
+            <option>{{ $key }}</option>
+            {{end}}
+        </select>
         <form id="form">
             <label for="query">Query</label>
             <input type="text" id="query" name="query">
