@@ -10,12 +10,13 @@ import (
 	"net/http"
 	"os"
     "regexp"
+    "strings"
     "unicode"
 )
 
 func main() {
 	searcher := Searcher{}
-	err := searcher.Load("completeworks.txt")
+	err := searcher.Load("workslist.txt", "worksbody.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -38,6 +39,7 @@ func main() {
 }
 
 type Searcher struct {
+    WorksTitles []string
 	CompleteWorks string
 	SuffixArray   *suffixarray.Index
 }
@@ -64,8 +66,13 @@ func handleSearch(searcher Searcher) func(w http.ResponseWriter, r *http.Request
 	}
 }
 
-func (s *Searcher) Load(filename string) error {
-	dat, err := ioutil.ReadFile(filename)
+func (s *Searcher) Load(titlefile string, bodyfile string) error {
+    titles, err := ioutil.ReadFile(titlefile)
+    if err!= nil {
+        return fmt.Errorf("Load: %w", err)
+    }
+    s.WorksTitles = strings.Split(string(titles), "\n\n")
+	dat, err := ioutil.ReadFile(bodyfile)
 	if err != nil {
 		return fmt.Errorf("Load: %w", err)
 	}
@@ -75,14 +82,20 @@ func (s *Searcher) Load(filename string) error {
 }
 
 func (s *Searcher) Search(query string) []string {
+    filter := regexp.MustCompile("[^a-zA-Z0-9.!?;:'\"\\-]+")
+    query = filter.ReplaceAllString(query, "")
     if !s.ContainsUpper(query) {
         query = "(?i)" + query
     }
     reg := regexp.MustCompile(query)
 	idxs := s.SuffixArray.FindAllIndex(reg, -1)
 	results := []string{}
+    curr_idx := 0
 	for _, idx := range idxs {
-		results = append(results, s.CompleteWorks[idx[0]-250:idx[1]+250])
+        if idx[0] >= curr_idx {
+            results = append(results, s.CompleteWorks[idx[0] - 100 : idx[1] + 100])
+            curr_idx = idx[1] + 100
+        }
 	}
 	return results
 }
