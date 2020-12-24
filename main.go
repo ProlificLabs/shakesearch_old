@@ -82,8 +82,8 @@ func (s *Searcher) Load(titlefile string, bodyfile string) error {
 }
 
 func (s *Searcher) Search(query string) []string {
-    filter := regexp.MustCompile("[^a-zA-Z0-9.!?;:'\"\\-]+")
-    query = filter.ReplaceAllString(query, "")
+    //filter := regexp.MustCompile("[^a-zA-Z0-9\s.!?;:\'\"\\-]+")
+    //query = filter.ReplaceAllString(query, "")
     if !s.ContainsUpper(query) {
         query = "(?i)" + query
     }
@@ -93,11 +93,49 @@ func (s *Searcher) Search(query string) []string {
     curr_idx := 0
 	for _, idx := range idxs {
         if idx[0] >= curr_idx {
-            results = append(results, s.CompleteWorks[idx[0] - 100 : idx[1] + 100])
-            curr_idx = idx[1] + 100
+            lines := s.GetLines(idx[0])
+            results = append(results, lines)
         }
 	}
 	return results
+}
+
+func (s *Searcher) GetLines(idx int) string {
+    result := s.CompleteWorks[idx-150 : idx+150]
+    lines := strings.Split(result, "\n")
+    count := 0
+    for i,line := range lines {
+        count += len(line)
+        if count > 150 {
+            result = strings.Join(lines[i-1 : i+2],"")
+        }
+    }
+    result = strings.Join(lines[:],"")
+    result = strings.Replace(result, "\n", "<br>", -1)
+    return result
+
+//    start, end := -1, -1
+//    sn, en := 0, 0
+//    for i := 0; start!=-1 && end!=-1 && i < 250; i++ {
+//        if string(s.CompleteWorks[idx-i]) == string("\n") {
+//            sn += 1
+//            if sn == 1 {
+//                start = idx-i+1
+//            }
+//        }
+//        if string(s.CompleteWorks[idx+i]) == string("\n") {
+//            en += 1
+//            if en == 1 {
+//                end = idx+i
+//            }
+//        }
+//    }
+//    if start == -1 || end == -1 {
+//        start,end = idx-100, idx+100
+//    }
+//    result := s.CompleteWorks[start : end]
+//    result = strings.Replace(result, "\n", "<br>", -1)
+//    return result, end
 }
 
 func (s *Searcher) ContainsUpper(str string) bool {
