@@ -14,8 +14,13 @@ exact matches.
 
 ## Your Mission
 
-Improve the search backend. Think about the problem from the user's perspective
-and prioritize your changes according to what you think is most useful.
+Improve the search backend. Think about the problem from the **user's perspective**
+and prioritize your changes according to what you think is most useful. 
+
+## Evaluation
+
+We will be primarily evaluating based on how well the search works for users. A search result with a lot of features (i.e. multi-words and mis-spellings handled), but with results that are hard to read would not be a strong submission. 
+
 
 ## Submission
 
