@@ -15,16 +15,6 @@ import (
     "unicode"
 )
 
-
-type Pair struct {
-    Name string
-    Value string
-}
-
-type Person struct {
-    Value string
-}
-
 func main() {
 	searcher := Searcher{}
 	err := searcher.Load("workslist.txt", "worksbody.txt")
@@ -51,24 +41,18 @@ func main() {
 }
 
 type Searcher struct {
-    WorksTitles []string
-	CompleteWorks string
-	SuffixArray   *suffixarray.Index
+    WorksTitles map[string]string
+	CompleteWorks map[string]string
+	SuffixArray   map[string]*suffixarray.Index
 }
 
 func handleDropdown(searcher Searcher) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-        var fruits = map[string]interface{}{
-				 "Apple":  "apple",
-				 "Orange": "orange",
-				 "Pear":   "pear",
-				 "Grape":  "grape",
-			}
         t, err := template.ParseFiles("static/index.html")
         if err != nil {
             panic(err)
         }
-        t.Execute(w, fruits)
+        t.Execute(w, searcher.WorksTitles)
     }
 }
 
@@ -99,22 +83,45 @@ func (s *Searcher) Load(titlefile string, bodyfile string) error {
     if err!= nil {
         return fmt.Errorf("Load: %w", err)
     }
-    s.WorksTitles = strings.Split(string(titles), "\n\n")
+    temp := strings.Split(string(titles), "\n\n")
+    s.WorksTitles = make(map[string]string)
+    for _,title :=  range temp {
+        s.WorksTitles[title] = title
+    }
 	dat, err := ioutil.ReadFile(bodyfile)
 	if err != nil {
 		return fmt.Errorf("Load: %w", err)
 	}
-	s.CompleteWorks = string(dat)
-	s.SuffixArray = suffixarray.New(dat)
+    s.CompleteWorks = make(map[string]string)
+    s.SuffixArray = make(map[string]*suffixarray.Index)
+
+    text := string(dat)
+    stext := suffixarray.New(dat)
+    s.CompleteWorks["ALL"] = text
+    s.SuffixArray["ALL"] = stext
+    for i,title := range temp {
+        start_idx := stext.Lookup([]byte(title), 1)[0]
+        end_idx := len(text)
+        if i < (len(temp) - 1) {
+            end_idx = stext.Lookup([]byte(temp[i+1]), 1)[0]
+        }
+        work_text := text[start_idx + len(title) : end_idx]
+        s.CompleteWorks[title] = work_text
+        s.SuffixArray[title] = suffixarray.New([]byte(work_text))
+    }
 	return nil
 }
 
 func (s *Searcher) Search(query string) []string {
     results := []string{}
+    temp := strings.Split(query, ":")
+    title := temp[0]
+    query = strings.Join(temp[1:], ":")
+
     if (query[0] == '"' && query[len(query)-1] == '"') {
-        idxs := s.SuffixArray.Lookup([]byte(query[1:len(query)-1]), -1)
+        idxs := s.SuffixArray[title].Lookup([]byte(query[1:len(query)-1]), -1)
         for _, idx := range idxs {
-            lines := s.GetLines(idx)
+            lines := s.GetLines(title, idx)
             results = append(results, lines)
         }
     } else {
@@ -128,17 +135,17 @@ func (s *Searcher) Search(query string) []string {
 
         query = strings.ReplaceAll(query, " ", "[.!?'\"\\s\\[\\]\\(\\)-]")
         reg := regexp.MustCompile(query)
-        idxs := s.SuffixArray.FindAllIndex(reg, -1)
+        idxs := s.SuffixArray[title].FindAllIndex(reg, -1)
         for _, idx := range idxs {
-            lines := s.GetLines(idx[0])
+            lines := s.GetLines(title, idx[0])
             results = append(results, lines)
         }
 	}
 	return results
 }
 
-func (s *Searcher) GetLines(idx int) string {
-    result := s.CompleteWorks[idx-100 : idx+100]
+func (s *Searcher) GetLines(title string, idx int) string {
+    result := s.CompleteWorks[title][idx-100 : idx+100]
     lines := strings.Split(result, "\n")
     count := 0
     for i,line := range lines {

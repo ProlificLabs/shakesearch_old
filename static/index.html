@@ -10,13 +10,13 @@
 
 <body>
     <p>
-        <select>
-            <option value="ALL"> all </option>
-            {{range $key, $value := .Fruits}}
-            <option>{{ $key }}</option>
-            {{end}}
-        </select>
         <form id="form">
+            <select id="title" name="title">
+                <option selected="selected"> ALL </option>
+                {{- range $key, $value := .}}
+                <option value="{{ $key }}">{{ $value }}</option>
+                {{- end}}
+            </select>
             <label for="query">Query</label>
             <input type="text" id="query" name="query">
             <button type="submit">Search</button>
