@@ -1,22 +1,32 @@
 const Controller = {
   search: (ev) => {
     ev.preventDefault();
+    const table = document.getElementById("table-body");
+    table.innerHTML = "";
     const form = document.getElementById("form");
     const data = Object.fromEntries(new FormData(form));
-    const response = fetch(`/search?q=${data.query}`).then((response) => {
+    const query = data.query;
+    const response = fetch(`/search?q=${query}`).then((response) => {
       response.json().then((results) => {
-        Controller.updateTable(results);
+        Controller.updateTable(results, query);
       });
     });
   },
 
-  updateTable: (results) => {
+  updateTable: (resp, query) => {
     const table = document.getElementById("table-body");
+    table.innerHTML = "";
     const rows = [];
-    for (let result of results) {
-      rows.push(`<tr>${result}<tr/>`);
+    if(resp && resp.results && resp.results.length) {
+      for (let res of resp.results) {
+        let reg =  new RegExp(`(${query})`, 'ig');
+        let formattedString = res.replace(reg, `<span class="replace">$&</span>`);
+        rows.push(`<tr> ** ${formattedString}<tr/>`);
+      }
+      table.innerHTML = rows.join('<br/>');
+    } else if(resp.correction !=="") {
+      table.innerHTML = `Did you mean ${resp.correction} ?`
     }
-    table.innerHTML = rows;
   },
 };
 

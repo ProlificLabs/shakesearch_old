@@ -192,6 +192,12 @@ textarea {
      https://www.phpied.com/delay-loading-your-print-css/
      ========================================================================== */
 
+.replace {
+  background: lightgreen;
+  font-weight: bolder;
+  font-style: italic;
+}
+
 @media print {
   *,
   *::before,
