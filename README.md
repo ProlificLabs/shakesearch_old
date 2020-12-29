@@ -30,6 +30,7 @@ current state, can be deployed easily on Heroku's free tier.
 3. In your submission, share with us what changes you made and how you would prioritize changes if you had more time.
 
 ## My Changes
+https://shakesearchboi.herokuapp.com/view
 ### Search
 * made search case insensitive, but if query contained uppercase, instead do case sensitive search, kind of like vim search
 * added space wildcard for punctuation (flower pot would match flower-pot as well)
