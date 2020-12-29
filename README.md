@@ -30,3 +30,5 @@ current state, can be deployed easily on Heroku's free tier.
 3. In your submission, share with us what changes you made and how you would prioritize changes if you had more time.
 
 
+## Solved issues
+1. Changed criteria from case-sensitive to case-insensitive

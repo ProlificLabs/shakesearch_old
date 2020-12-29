@@ -5,16 +5,18 @@ const Controller = {
     const data = Object.fromEntries(new FormData(form));
     const response = fetch(`/search?q=${data.query}`).then((response) => {
       response.json().then((results) => {
-        Controller.updateTable(results);
+        Controller.updateTable(results, data.query);
       });
     });
   },
 
-  updateTable: (results) => {
+  updateTable: (results, query) => {
     const table = document.getElementById("table-body");
-    const rows = [];
+    let rows = '';
     for (let result of results) {
-      rows.push(`<tr>${result}<tr/>`);
+      let regExpQuery = new RegExp('('+query+')', 'gi');
+      let formattedString = result.replace(regExpQuery, `<span style='background: yellow;'>$&</span>`);
+      rows += `<tr>...${formattedString}...<tr/>`;
     }
     table.innerHTML = rows;
   },
