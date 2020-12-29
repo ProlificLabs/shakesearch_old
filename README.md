@@ -29,4 +29,14 @@ We will be primarily evaluating based on how well the search works for users. A 
 current state, can be deployed easily on Heroku's free tier.
 3. In your submission, share with us what changes you made and how you would prioritize changes if you had more time.
 
+## My Changes
+### Search
+* made search case insensitive, but if query contained uppercase, instead do case sensitive search, kind of like vim search
+* added space wildcard for punctuation (flower pot would match flower-pot as well)
+* added "ed" to "'d" old english search flexibility ("wreathed" matches "wreath'd")
+* made search regex insensitive since normal users probably would not search with regex normally/expect regex (i.e. "." wildcard)
+
+### Prettify
+* display results with line before and after (seemed like a good format for plays/sonnets)
+* Added a dropdown to be able to filter by Work, default is "ALL" which searches all works as before
 
