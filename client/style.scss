@@ -15,6 +15,7 @@ body {
   padding: 0;
   font-family: Arial, Helvetica, sans-serif;
   margin: 0;
+  padding-bottom: 5rem;
 }
 
 #form {
@@ -55,9 +56,10 @@ body {
   }
 }
 
-.search-results {
+#search-results {
   padding-top: 100px;
   display: flex;
+  flex-direction: column;
   margin: 0 auto;
   width: 1000px;
 }
@@ -66,10 +68,19 @@ table {
   border-collapse: collapse;
 
   .result-item {
-    padding-bottom: 2rem;
+    padding-bottom: 1.5rem;
+  }
+
+  .result-body {
+    border: 1px solid $gray;
+    border-radius: 14px;
+    padding: 1rem;
+    line-height: 1.45rem;
   }
 
   .highlight-query {
+    padding: 1px 4px;
+    border-radius: 5px;
     background: $yellow;
   }
 }

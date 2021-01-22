@@ -23,7 +23,7 @@ class Controller {
       const row = `
         <tr>
           <td class="result-item">
-            ${highlightedResult}
+            <div class="result-body">${highlightedResult}</div>
           </td>
         </tr>
       `;
@@ -39,6 +39,11 @@ class Controller {
       Controller.queryRX,
       '<span class="highlight-query">$1</span>'
     );
+  }
+
+  static insertPagination() {
+    const paginationEL = document.getElementById('pagination');
+    paginationEL.innerHTML = this.paginator.html();
   }
 }
 

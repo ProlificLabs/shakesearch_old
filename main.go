@@ -75,16 +75,18 @@ func (s *Searcher) Load(filename string) error {
 }
 
 func (s *Searcher) Search(query string) []string {
+	query, query1, query2 :=
+		strings.ToLower(query),
+		strings.ToUpper(query),
+		strings.Title(query)
 
-
-	query = strings.ToLower(query)
-	query1 := strings.ToUpper(query)
-	query2 := strings.Title(query)
-	idxs := s.SuffixArray.Lookup([]byte(query), -1)
-	idxs1 := s.SuffixArray.Lookup([]byte(query1), -1)
-	idxs2 := s.SuffixArray.Lookup([]byte(query2), -1)
+	idxs, idxs1, idxs2 :=
+		s.SuffixArray.Lookup([]byte(query), -1),
+		s.SuffixArray.Lookup([]byte(query1), -1),
+		s.SuffixArray.Lookup([]byte(query2), -1)
 
 	results := []string{}
+
 	for _, idx := range idxs {
 		results = append(results, s.CompleteWorks[idx-250:idx+250])
 	}
@@ -92,16 +94,10 @@ func (s *Searcher) Search(query string) []string {
 	for _, idx := range idxs1 {
 		results = append(results, s.CompleteWorks[idx-250:idx+250])
 	}
+
 	for _, idx := range idxs2 {
 		results = append(results, s.CompleteWorks[idx-250:idx+250])
 	}
 
 	return results
-
-	// idxs := s.SuffixArray.Lookup([]byte(query), -1)
-	// results := []string{}
-	// for _, idx := range idxs {
-	// 	results = append(results, s.CompleteWorks[idx-250:idx+250])
-	// }
-	// return results
 }
