@@ -9,6 +9,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"regexp"
+	"strings"
 )
 
 func main() {
@@ -67,16 +69,29 @@ func (s *Searcher) Load(filename string) error {
 	if err != nil {
 		return fmt.Errorf("Load: %w", err)
 	}
-	s.CompleteWorks = string(dat)
-	s.SuffixArray = suffixarray.New(dat)
+
+	dataString := string(dat)
+	s.CompleteWorks = dataString
+
+	normalizedData := strings.ToLower(dataString)
+	s.SuffixArray = suffixarray.New([]byte(normalizedData))
 	return nil
 }
 
 func (s *Searcher) Search(query string) []string {
-	idxs := s.SuffixArray.Lookup([]byte(query), -1)
+	normalizedQuery := strings.ToLower(query)
+	idxs := s.SuffixArray.Lookup([]byte(normalizedQuery), -1)
 	results := []string{}
 	for _, idx := range idxs {
-		results = append(results, s.CompleteWorks[idx-250:idx+250])
+		result := phraseSlice(s.CompleteWorks[idx-250:idx+250], query)
+		if result != "" {
+			results = append(results, result)
+		}
 	}
 	return results
+}
+
+func phraseSlice(phrase string, query string) string {
+	re, _ := regexp.Compile("(?i).*" + query + ".*")
+	return string(re.Find([]byte(phrase)))
 }

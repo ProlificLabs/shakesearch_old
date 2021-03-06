@@ -30,3 +30,12 @@ current state, can be deployed easily on Heroku's free tier.
 3. In your submission, share with us what changes you made and how you would prioritize changes if you had more time.
 
 
+## Improvements
+### Backend
+- Support for case insensitive searches
+- Reduce result to one sentence
+
+### UI
+- Replace new lines (\n) for html newlines (<br>)
+- Highlight results coincidences 
+- Search while typing
