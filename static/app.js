@@ -19,13 +19,24 @@ const Controller = {
     console.log(results)
   var index = 0
     for (x in results) {
-      html_tabs +='<li><a href="#tab'+index+'">'+x+'</a></li>';
-
-      for (y in results[x]) {
-        for (z in results[x][y])
-        html_content +='<div id="tab'+index+'"><p>'+results[x][y][z]+'</p></div>';
+      if (x == "mindex") {
+        html_tabs +='<li><a href="#tab'+index+'">'+'Main Index'+'</a></li>';
+      } else {
+        html_tabs +='<li><a href="#tab'+index+'">'+x+'</a></li>';
       }
+      html_content +='<div id="tab'+index+'">';
+      for (y in results[x]) {
 
+        html_content +='<p><b><u>'+y;
+        if (x != "mindex") {
+          html_content +=':';
+        }
+        html_content +='</b></u></p>';
+
+        for (z in results[x][y])
+        html_content +='<p>'+results[x][y][z]+'</p>';
+      }
+      html_content +='</div>';
       index += index + 1;
     }
     tabs.html(html_tabs);

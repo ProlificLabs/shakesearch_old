@@ -9,13 +9,19 @@
 </head>
 
 <body>
+    <h1 style="text-align:center">ShakeSearch</h1>
     <p>
-        <form id="form">
-            <label for="query">Query</label>
+        <form id="form" style="text-align:center">
+            <label for="query">Query:</label>
             <input type="text" id="query" name="query">
-            <label for="filter">Filter</label>
-            <input type="text" id="filter" name="filter">
-            <label for="dataset">Dataset</label>
+            <label for="filter">Filter:</label>
+            <select name="filter" id="filter" multiple>
+                <option value="toc">Table of Contents</option>
+                <option value="characters">Characters</option>
+                <option value="work">work</option>
+                <option value="none" selected>None</option>
+              </select>
+            <label for="dataset">Dataset(aka. titles to search within; comma separated; mindex for main index):</label>
             <input type="text" id="dataset" name="dataset" value="all">
             <label for="limit">Limit results</label>
             <input type="number" id="limit" name="limit" value="-1">

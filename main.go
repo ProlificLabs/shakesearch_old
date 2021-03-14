@@ -55,15 +55,15 @@ func searchWithFilter(s Searcher, filters []string, queries []string, limit int)
 				for _, idx := range idxs {
 					l := len(s.toc)
 					var lb, ub int
-					if idx-20 < 0 {
+					if idx-40 < 0 {
 						lb = 0
 					} else {
-						lb = idx - 20
+						lb = idx - 40
 					}
-					if idx+20 > l {
+					if idx+40 > l {
 						ub = l
 					} else {
-						ub = idx + 20
+						ub = idx + 40
 					}
 					sresult.TOC = append(sresult.TOC, s.toc[lb:ub])
 				}
@@ -127,7 +127,7 @@ func handleSearch() func(w http.ResponseWriter, r *http.Request) {
 		}
 		queries := strings.Split(q[0], " ")
 		filters, ok := r.URL.Query()["f"]
-		if !ok || filters[0] == "" {
+		if !ok || filters[0] == "" || filters[0] == "none" || filters[0] == "undefined" {
 			filters = append(filters, "toc") // If no filter is set, explicitly setting search scope to all
 			filters = append(filters, "work")
 			filters = append(filters, "characters")
