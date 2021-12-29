@@ -1,0 +1,10 @@
+#table {
+    border-top: 3px double black;
+    margin-top: 1em;
+    width: 100%;
+}
+
+#table-body tr:not(:last-child) > td {
+    border-bottom: 1px dashed black;
+    padding: 1em 0;
+}

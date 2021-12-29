@@ -12,11 +12,13 @@ const Controller = {
 
   updateTable: (results) => {
     const table = document.getElementById("table-body");
-    const rows = [];
     for (let result of results) {
-      rows.push(`<tr>${result}<tr/>`);
+      const tr = document.createElement("tr");
+      const td = document.createElement("td");
+      td.innerText = result;
+      tr.appendChild(td);
+      table.appendChild(tr);
     }
-    table.innerHTML = rows;
   },
 };
 
