@@ -29,3 +29,10 @@ We will be primarily evaluating based on how well the search works for users. A 
 2. Heroku hosting - The project includes a Heroku Procfile and, in its
    current state, can be deployed easily on Heroku's free tier.
 3. In your submission, share with us what changes you made and how you would prioritize changes if you had more time.
+
+## Future Changes
+
+1. JS: Use `async`/`await` for more concise code.
+2. JS: Use FP `Array` methods for more concise and composed code.
+3. Go: Add string indices to each result for visual highlighting.
+4. Add tests.
