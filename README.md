@@ -8,13 +8,13 @@ You can see a live version of the app at
 https://pulley-shakesearch.herokuapp.com/. Try searching for "Hamlet" to display
 a set of results.
 
-In it's current state, however, the app is just a rough prototype. The search is
+In it's current state, however, the app is in rough shape. The search is
 case sensitive, the results are difficult to read, and the search is limited to
 exact matches.
 
 ## Your Mission
 
-Improve the search backend. Think about the problem from the **user's perspective**
+Improve the app! Think about the problem from the **user's perspective**
 and prioritize your changes according to what you think is most useful.
 
 You can approach this with a back-end, front-end, or full-stack focus.
