@@ -260,3 +260,7 @@ textarea {
     page-break-after: avoid;
   }
 }
+
+.search-term {
+  color: red;
+}
