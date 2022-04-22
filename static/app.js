@@ -13,10 +13,14 @@ const Controller = {
   updateTable: (results) => {
     const table = document.getElementById("table-body");
     const rows = [];
-    for (let result of results) {
-      rows.push(`<tr>${result}<tr/>`);
-    }
-    table.innerHTML = rows;
+    if (!results || results.length == 0) {
+      table.innerHTML = "No results found";
+    } else {
+      for (let result of results) {
+        rows.push(`<tr>${result}<tr/>`);
+      }
+      table.innerHTML = rows;
+      }
   },
 };
 

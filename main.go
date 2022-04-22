@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"regexp"
 )
 
 func main() {
@@ -38,7 +39,14 @@ func main() {
 type Searcher struct {
 	CompleteWorks string
 	SuffixArray   *suffixarray.Index
+//	Works         []Work
 }
+
+// type Work {
+// 	Title       string
+// 	Text        string
+// 	SuffixArray *suffixarray.Index
+// }
 
 func handleSearch(searcher Searcher) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -69,6 +77,16 @@ func (s *Searcher) Load(filename string) error {
 	}
 	s.CompleteWorks = string(dat)
 	s.SuffixArray = suffixarray.New(dat)
+
+	//r := regexp.MustCompile(`(?m:^THE$)`)
+	r := regexp.MustCompile(`\nTHE SONNETS`)
+	fmt.Printf("%#v\n", r.FindStringIndex(s.CompleteWorks)) // use 1 as start
+	r3 := regexp.MustCompile(`\nTHE END`)
+	fmt.Printf("%#v\n", r3.FindStringIndex(s.CompleteWorks)) // use 0 as finish
+
+	// r2 := regexp.MustCompile(`(?:[^0-9\n]+\n)+`)
+	// fmt.Printf("%#v\n", r2.FindStringSubmatch(s.CompleteWorks))
+
 	return nil
 }
 
