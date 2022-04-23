@@ -87,16 +87,25 @@ func (s *Searcher) Load(filename string) error {
 		work.Title = "Sonnet " + strconv.Itoa(index + 1)
 		work.Text = sonnet
 		work.SuffixArray = suffixarray.New([]byte(sonnet))
+		s.Works = append(s.Works, work);
 	}
 
 	return nil
 }
 
 func (s *Searcher) Search(query string) []string {
-	idxs := s.SuffixArray.Lookup([]byte(query), -1)
+	// idxs := s.SuffixArray.Lookup([]byte(query), -1)
+	// results := []string{}
+	// for _, idx := range idxs {
+	// 	results = append(results, s.CompleteWorks[idx-250:idx+250])
+	// }
+	// return results
 	results := []string{}
-	for _, idx := range idxs {
-		results = append(results, s.CompleteWorks[idx-250:idx+250])
+
+	for _, work := range s.Works {
+		for _, idx := range work.SuffixArray.Lookup([]byte(query), -1) {
+			results = append(results, work.Title + ": " + work.Text[idx-10:idx+10])
+		}
 	}
 	return results
 }
