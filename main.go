@@ -130,6 +130,23 @@ func (s *Searcher) Load(filename string) error {
 	return nil
 }
 
+func (s *Searcher) Search(query string) []string {
+	// idxs := s.SuffixArray.Lookup([]byte(query), -1)
+	// results := []string{}
+	// for _, idx := range idxs {
+	// 	results = append(results, s.CompleteWorks[idx-250:idx+250])
+	// }
+	// return results
+	results := []string{}
+
+	for _, work := range s.Works {
+		for _, idx := range work.SuffixArray.Lookup([]byte(query), -1) {
+			results = append(results, work.Title + ": " + s.getLine(idx, work.Text))
+		}
+	}
+	return results
+}
+
 func (s *Searcher) loadSonnets() {
 	sonnetsStart := regexp.MustCompile(`\nTHE SONNETS`).FindStringIndex(s.CompleteWorks)[1]
 	sonnetsEnd := regexp.MustCompile(`\nTHE END`).FindStringIndex(s.CompleteWorks)[0]
@@ -165,19 +182,15 @@ func (s *Searcher) loadPlays() {
 	}
 }
 
-func (s *Searcher) Search(query string) []string {
-	// idxs := s.SuffixArray.Lookup([]byte(query), -1)
-	// results := []string{}
-	// for _, idx := range idxs {
-	// 	results = append(results, s.CompleteWorks[idx-250:idx+250])
-	// }
-	// return results
-	results := []string{}
+func (s *Searcher) getLine(index int, source string) string {
+	var start, end = index, index
 
-	for _, work := range s.Works {
-		for _, idx := range work.SuffixArray.Lookup([]byte(query), -1) {
-			results = append(results, work.Title + ": " + work.Text[idx-10:idx+10])
-		}
+	for source[start] != '\n' && source[start] != '\r' {
+		start--
 	}
-	return results
+	for source[end] != '\n' && source[end] != '\r' {
+		end++
+	}
+
+	return source[start:end]
 }
