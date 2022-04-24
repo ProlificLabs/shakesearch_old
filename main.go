@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"index/suffixarray"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -66,20 +65,14 @@ type Searcher struct {
 type Work struct {
 	Title       string
 	Text        string
-	SuffixArray *suffixarray.Index
 }
 
 type WorkResult struct {
 	Index   int
 	Title   string
-	Matches []WorkMatch
+	Matches []string
 }
 
-type WorkMatch struct {
-	Text  string
-	Index int
-}
-	
 func main() {
 	searcher := Searcher{}
 	err := searcher.Load("completeworks.txt")
@@ -91,6 +84,7 @@ func main() {
 	http.Handle("/", fs)
 
 	http.HandleFunc("/search", handleSearch(searcher))
+	http.HandleFunc("/work", handleWork(searcher))
 
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -126,6 +120,38 @@ func handleSearch(searcher Searcher) func(w http.ResponseWriter, r *http.Request
 	}
 }
 
+func handleWork(searcher Searcher) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		work, ok := r.URL.Query()["work"]
+		if !ok || len(work[0]) < 1 {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte("missing work query in URL params"))
+			return
+		}
+		workIndex, queryError := strconv.Atoi(work[0])
+		if queryError != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte("non-integral id provided"))
+			return
+		}
+		results := searcher.GetWork(workIndex)
+		buf := &bytes.Buffer{}
+		enc := json.NewEncoder(buf)
+		err := enc.Encode(results)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte("encoding failure"))
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(buf.Bytes())
+	}
+}
+
+func (s *Searcher) GetWork(index int) Work {
+	return s.Works[index]
+}
+
 func (s *Searcher) Load(filename string) error {
 	dat, err := ioutil.ReadFile(filename)
 	if err != nil {
@@ -147,12 +173,8 @@ func (s *Searcher) Search(query string) []WorkResult {
 		result.Index = workIndex
 		result.Title = work.Title
 
-		for _, matchIndex := range work.SuffixArray.Lookup([]byte(query), -1) {
-			match := WorkMatch{}
-			match.Index = matchIndex;
-			match.Text = s.getLine(matchIndex, work.Text)
-
-			result.Matches = append(result.Matches, match)
+		for _, matchIndex := range regexp.MustCompile("(?i)" + query).FindAllStringIndex(work.Text, -1) {
+			result.Matches = append(result.Matches, s.getLine(matchIndex[0], work.Text))
 		}
 
 		if (len(result.Matches) > 0) {
@@ -170,7 +192,6 @@ func (s *Searcher) loadSonnets() {
 		work := Work{}
 		work.Title = "Sonnet " + strconv.Itoa(index + 1)
 		work.Text = sonnet
-		work.SuffixArray = suffixarray.New([]byte(sonnet))
 		s.Works = append(s.Works, work);
 	}
 }
@@ -180,19 +201,18 @@ func (s *Searcher) loadPlays() {
 	playsEnd := regexp.MustCompile(`CONTENT NOTE`).FindStringIndex(s.CompleteWorks)[0]
 
 	for titleIndex, title := range playTitles {
-		start := regexp.MustCompile(title).FindStringIndex(s.CompleteWorks[playsStart:playsEnd])[1]
+		start := playsStart + regexp.MustCompile(title).FindStringIndex(s.CompleteWorks[playsStart:playsEnd])[1]
 		var end int
 		if (titleIndex == len(playTitles) - 1) {
 			end = playsEnd
 		} else {
-			end = regexp.MustCompile(playTitles[titleIndex + 1]).FindStringIndex(s.CompleteWorks[playsStart:playsEnd])[0]
+			end = playsStart + regexp.MustCompile(playTitles[titleIndex + 1]).FindStringIndex(s.CompleteWorks[playsStart:playsEnd])[0]
 		}
 		text := s.CompleteWorks[start:end]
 
 		work := Work{}
 		work.Title = title
 		work.Text = text
-		work.SuffixArray = suffixarray.New([]byte(text))
 		s.Works = append(s.Works, work);
 	}
 }
