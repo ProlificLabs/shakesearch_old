@@ -12,15 +12,36 @@ const Controller = {
 
   updateTable: (results) => {
     const table = document.getElementById("table-body");
-    const rows = [];
     if (!results || results.length == 0) {
       table.innerHTML = "No results found";
     } else {
+      table.innerHTML = "";
+      let rows = [];
       for (let result of results) {
-        rows.push(`<tr>${result}<tr/>`);
+        let row = document.createElement("tr");
+        
+        let title = document.createElement("h3");
+        row.appendChild(title);
+        title.appendChild(document.createTextNode(result.Title));
+        
+        let matchList = document.createElement("ul");
+        row.appendChild(matchList);
+        for (let match of result.Matches) {
+          let matchItem = document.createElement("li");
+          matchList.appendChild(matchItem);
+          let matchLink = document.createElement("a");
+          matchItem.appendChild(matchLink);
+
+          matchLink.appendChild(document.createTextNode(match.Text));
+          matchLink.setAttribute("href", `/work/${result.Index}?idx=${match.Index}`);
+        }
+        
+        rows.push(row);
       }
-      table.innerHTML = rows;
+      for (let row of rows) {
+        table.appendChild(row);
       }
+    }
   },
 };
 

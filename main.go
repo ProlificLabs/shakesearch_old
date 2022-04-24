@@ -58,6 +58,28 @@ var playTitles = []string{
 	"THE RAPE OF LUCRECE",
 	"VENUS AND ADONIS"}
 
+type Searcher struct {
+	CompleteWorks string
+	Works         []Work
+}
+
+type Work struct {
+	Title       string
+	Text        string
+	SuffixArray *suffixarray.Index
+}
+
+type WorkResult struct {
+	Index   int
+	Title   string
+	Matches []WorkMatch
+}
+
+type WorkMatch struct {
+	Text  string
+	Index int
+}
+	
 func main() {
 	searcher := Searcher{}
 	err := searcher.Load("completeworks.txt")
@@ -80,18 +102,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-}
-
-type Searcher struct {
-	CompleteWorks string
-	SuffixArray   *suffixarray.Index
-	Works         []Work
-}
-
-type Work struct {
-	Title       string
-	Text        string
-	SuffixArray *suffixarray.Index
 }
 
 func handleSearch(searcher Searcher) func(w http.ResponseWriter, r *http.Request) {
@@ -122,7 +132,6 @@ func (s *Searcher) Load(filename string) error {
 		return fmt.Errorf("Load: %w", err)
 	}
 	s.CompleteWorks = string(dat)
-	s.SuffixArray = suffixarray.New(dat)
 
 	s.loadSonnets()
 	s.loadPlays()
@@ -130,18 +139,24 @@ func (s *Searcher) Load(filename string) error {
 	return nil
 }
 
-func (s *Searcher) Search(query string) []string {
-	// idxs := s.SuffixArray.Lookup([]byte(query), -1)
-	// results := []string{}
-	// for _, idx := range idxs {
-	// 	results = append(results, s.CompleteWorks[idx-250:idx+250])
-	// }
-	// return results
-	results := []string{}
+func (s *Searcher) Search(query string) []WorkResult {
+	results := []WorkResult{}
 
-	for _, work := range s.Works {
-		for _, idx := range work.SuffixArray.Lookup([]byte(query), -1) {
-			results = append(results, work.Title + ": " + s.getLine(idx, work.Text))
+	for workIndex, work := range s.Works {
+		result := WorkResult{}
+		result.Index = workIndex
+		result.Title = work.Title
+
+		for _, matchIndex := range work.SuffixArray.Lookup([]byte(query), -1) {
+			match := WorkMatch{}
+			match.Index = matchIndex;
+			match.Text = s.getLine(matchIndex, work.Text)
+
+			result.Matches = append(result.Matches, match)
+		}
+
+		if (len(result.Matches) > 0) {
+			results = append(results, result)
 		}
 	}
 	return results
