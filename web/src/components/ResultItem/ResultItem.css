@@ -1,0 +1,9 @@
+.itemContainer {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  overflow-y: scroll;
+}
+
+.itemContainer::-webkit-scrollbar {
+  display: none;
+}
