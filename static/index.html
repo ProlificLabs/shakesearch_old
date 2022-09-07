@@ -8,18 +8,24 @@
   <meta name="theme-color" content="#fafafa">
 </head>
 
-<body>
+<body class="main">
     <p>
-        <form id="form">
-            <label for="query">Query</label>
-            <input type="text" id="query" name="query">
-            <button type="submit">Search</button>
+        <form id="form" class="center-vertical center-horizontal" autocomplete="off" >
+            <!-- <label for="query">Query</label> -->
+            <input type="text" id="query" name="query" placeholder="Enter your query">
+            <div class="search-button-wrapper"><button type="submit" id="search-button">Search</button></div>
+            
         </form>
+        <div id="status-info">
+        </div>
     </p>
     <p>
-        <table id="table">
+        <!-- <table id="table">
           <tbody id="table-body"></tbody>
-        </table>
+        </table> -->
+        <ul id="search-list">
+          
+        </ul>
     </p>
   <script src="app.js"></script>
 </body>
