@@ -6,13 +6,21 @@
   <title>ShakeSearch</title>
   <link rel="stylesheet" href="style.css">
   <meta name="theme-color" content="#fafafa">
+  <script src="https://kit.fontawesome.com/1181511623.js" crossorigin="anonymous"></script>
 </head>
 
 <body class="main">
     <p>
         <form id="form" class="center-vertical center-horizontal" autocomplete="off" >
             <!-- <label for="query">Query</label> -->
-            <input type="text" id="query" name="query" placeholder="Enter your query">
+            <div class="search-bar">
+              <input type="text" class="search-input" id="query" name="query" placeholder="Enter your query">
+              <div class="explanation-wrapper tooltip">
+                <i class="fa-solid fa-question" style="color: #fd5f00"></i>
+                <span class="tooltiptext">Search for keywords or match patterns with <a href="https://ubuntu.com/blog/regex-basics#how-to-use-regex">Regex</a>.</span>
+              </div>
+            </div>
+            
             <div class="search-button-wrapper"><button type="submit" id="search-button">Search</button></div>
             
         </form>

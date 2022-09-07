@@ -48,6 +48,11 @@ const Controller = {
           statusInfo.prepend(errorMessage);
           console.log(error);
         }
+        try {
+          spinner.parentElement.removeChild(spinner);
+        } catch (err) {
+          // do nothing because that means spinner was already removed
+        }
       });
     });
   }, 

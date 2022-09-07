@@ -270,19 +270,27 @@ textarea {
   align-items: center;
 }
 
-input {
-  width: 100%;
+.search-bar {
   padding: 25px;
-  font-size: 24px;
   border-radius: 32px;
   border: #ebebeb solid 1px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 }
 
-input:hover {
+.search-bar:hover {
   outline: none !important;
-  box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
-  /* color: #FD5F00; */
-  /* border-color: #FD5F00; */
+  box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px; 
+}
+
+input {
+  border: none; 
+  font-size: 24px;
+}
+
+input:focus {
+  outline: none;
 }
 
 .search-button-wrapper {
@@ -317,6 +325,7 @@ ul {
 
 .card {
   padding: 20px;
+  padding-bottom: 10px;
   border-radius: 32px;
   border: #ebebeb solid 1px;
   display: flex;
@@ -340,8 +349,8 @@ ul {
 }
 
 .spinner {
-  border: 16px solid #f3f3f3; /* Light grey */
-  border-top: 16px solid #fd5f00; /* Blue */
+  border: 16px solid #ebebeb; 
+  border-top: 16px solid #fd5f00; 
   border-radius: 50%;
   width: 120px;
   height: 120px;
@@ -354,9 +363,13 @@ ul {
 }
 
 .open-work-wrapper {
-  padding: 5px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  padding-top: 10px;
   border-top: #ebebeb solid 1px;
   margin-top: 10px;
+  width: 100%;
 }
 
 .open-work {
@@ -364,7 +377,56 @@ ul {
 	color: inherit;
 	border: none;
 	padding: 0;
-	/* font: inherit; */
 	cursor: pointer;
 	outline: inherit;
+}
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 120px;
+  background-color: #fff;
+  text-align: center;
+  padding: 5px 0;
+  border-radius: 24px;
+  border: #ebebeb solid 1px;
+ 
+  position: absolute;
+  z-index: 1;
+}
+
+.tooltip .tooltiptext {
+  margin-top: 5px;
+  width: 220px;
+  top: 100%;
+  left: 50%;
+  margin-left: -110px; 
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}
+
+.tooltip .tooltiptext::after {
+  content: " ";
+  position: absolute;
+  bottom: 100%;  
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent transparent #ebebeb transparent;
+}
+
+a {
+  color: #fd5f00;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
 }
