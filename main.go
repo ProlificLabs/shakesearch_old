@@ -343,7 +343,7 @@ func (s *SearchLine) highlightQuery(query string) SearchLine {
 
 func (s *SearchLine) addScrollId() SearchLine {
 	return SearchLine{
-		TextResult: `<span id="scroll-here"> </span>` + s.TextResult,
+		TextResult: `<span id="scroll-here"></span>` + s.TextResult,
 		LineIndex:  s.LineIndex,
 	}
 }
