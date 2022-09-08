@@ -16,19 +16,20 @@ const Controller = {
     const form = document.getElementById("form");
     const data = Object.fromEntries(new FormData(form));
     const response = fetch(`/search?q=${data.query}`).then((response) => {
-      if (response.status === 400) {
-        // display error message
-        const statusInfo = document.getElementById("status-info");
-        const errorMessage = document.createElement("h3");
-        errorMessage.innerHTML = `<span style="color: #FD5F00;">Your search did not match anything. </span> <br>
-          <br> Suggestions: 
-           <br> Make sure all words are spelled correctly. 
-           <br> Try different keywords.
-           <br> Try more general keywords.
-           <br> Try fewer keywords.`;
-        statusInfo.prepend(errorMessage);
-      }
       response.json().then((results) => {
+        if (results.length === 0) {
+          const statusInfo = document.getElementById("status-info");
+          const errorMessage = document.createElement("h3");
+          errorMessage.innerHTML = `<span style="color: #FD5F00;">Your search did not match anything. </span> <br>
+            <br> Suggestions: 
+            <br> Make sure all words are spelled correctly. 
+            <br> Try different keywords.
+            <br> Try more general keywords.
+            <br> Try fewer keywords.
+            <br> Add (?i) in front of your query to make it case insensitive.`;
+          statusInfo.prepend(errorMessage);
+        }
+
         Controller.updateTable(results, data.query);
         try {
           spinner.parentElement.removeChild(spinner);
@@ -37,17 +38,12 @@ const Controller = {
         }
       })
       .catch(error => {
-        if (error instanceof SyntaxError) {
-          // do nothing because this happens when the query has no matches
-        } 
-        else {
-          const statusInfo = document.getElementById("status-info");
-          statusInfo.innerHTML = "";
-          const errorMessage = document.createElement("h3");
-          errorMessage.innerHTML = `<span style="color: #FD5F00;">Something went wrong. Try again later... </span>`;
-          statusInfo.prepend(errorMessage);
-          console.log(error);
-        }
+        const statusInfo = document.getElementById("status-info");
+        statusInfo.innerHTML = "";
+        const errorMessage = document.createElement("h3");
+        errorMessage.innerHTML = `<span style="color: #FD5F00;">Something went wrong. Try again later... </span>`;
+        statusInfo.prepend(errorMessage);
+        console.log(error);
         try {
           spinner.parentElement.removeChild(spinner);
         } catch (err) {
@@ -71,9 +67,6 @@ const Controller = {
       searchList.insertAdjacentHTML( 'beforeend', `<li id=${firstLine.LineIndex + "-" + lastLine.LineIndex}><div class="card">
           <pre>${text}  <pre/>
         <div/> <li/>`);
-
-      console.log("searchList: ");
-      console.log(searchList);
       const preList = searchList.getElementsByTagName('pre')
 
       // delete pre element that got added by joining <li> elements
@@ -96,7 +89,6 @@ const Controller = {
         button1.innerHTML = "...";
         button1.classList.add("add-lines");
         button1.addEventListener("click", function(event) {
-          console.log("button1 is clicked");
           handleAddLinesClick(event, true);
         });
       } else {
@@ -109,7 +101,6 @@ const Controller = {
         button2.innerHTML = "...";
         button2.classList.add("add-lines");
         button2.addEventListener("click", function(event) {
-          console.log("button2 is clicked");
           handleAddLinesClick(event, false);
         });
       } else {
@@ -126,7 +117,6 @@ const Controller = {
       const openBookButtons = card.getElementsByClassName("open-work");
       for (let i = 0; i < openBookButtons.length; i++) {
         openBookButtons[i].addEventListener("click", (event) => {
-          console.log("clicked Open book button")
           handleOpenWorkClick(event, query);
         })
       }
@@ -185,7 +175,6 @@ const addExtraLines = (wrapper, event, addLinesUp, result) => {
     result = result.reverse();
   } 
   const text = formatParagraph(result);
-  console.log("text: " + text);
   if (addLinesUp) {
     // Change text to add new lines
     pre.innerHTML = text + pre.innerHTML;
