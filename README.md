@@ -55,7 +55,7 @@ There are two types of future changes: (a) new features and (b) small usability 
 ### New Features
 
 - Model that answers questions about the works of Shakespeare. E.g. someone could ask `How did "Romeo and Juliet" end?` and then the model would answer it. This could be done by fine-tuning OpenAI's GPT-3 on the works (although it probably already knows it), and then calling the prompts through their API. 
-- If users end up using it to read the works, they would probably want their reading progress to be saved. After all, it can be *quite* annoying to find where you left off. In order to do that, users should be able to login, and we should store their reading progress in a DB. 
+- If users end up using it to read the works, they would probably want their reading progress to be saved. After all, it can be *quite* annoying to have to look for where you left off. In order to do that, users should be able to login, and we should store their reading progress in a DB. 
 - Search suggestions and spelling suggestions in the way Google does it. (I.e. by having the suggestions drop down.)
 
 
