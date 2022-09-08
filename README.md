@@ -46,7 +46,7 @@ You can see all the changes at https://shakesearch-max.herokuapp.com/. Throughou
 9. If users wanted to read an entire book, it would be *quite* annoying to constanly click to get the next 3 lines, which is why I added a button to show the full book of that particular snippet. 
 10. Added a spinner/loader so that it's obvious when results are loading.
 11. Added status messages if there are no results, and if there are errors on the backend. 
-12. When opening a book, it can be annoying that it brings you to the beginning of the book. Instead it should bring you as close as possible to where you were reading. I made it so that, when you open a book,  it scrolls to the last line of the snippet where you clicked to open it. (My reasoning was that the last line is likely the line that you read last. It's also the closest line to the button to open the book.)
+12. When opening a book, it can be annoying that it brings you to the beginning of the book. Instead, it should bring you as close as possible to where you were reading. I made it so that, when you open a book,  it scrolls to the last line of the snippet that you wanted to open. (My reasoning was that the last line is likely the line that you read last. It's also the closest line to the button to open the book.)
 
 ## Future Changes
 
@@ -61,7 +61,7 @@ There are two types of future changes: (a) new features and (b) small usability 
 
 ### Usability Fixes
 
-- ~~When opening a book, it should automatically scroll to the last sentence of the snippet. This can be done by adding a `<span>` with id `scroll-here` on the backend. On the frontend, you can then programmatically scroll to the element with id `scroll-here`. ~~ I added this while waiting on my flight in the airport ;)
+- ~~When opening a book, it should automatically scroll to the last sentence of the snippet. This can be done by adding a `<span>` with id `scroll-here` on the backend. On the frontend, you can then programmatically scroll to the element with id `scroll-here`.~~ I added this while waiting on my flight in the airport ;)
 - Generally speaking, a user should always be able to undo their actions. With the current version, however, you can't go back if you open a book. This can be fixed by changing the stack history of the browser or by having a stack internally and overriding the behavior of the "back" button in the browser. 
 - When there are too many matches, it takes too long to insert the new lines at once. Instead it should show how many matches there are with either pagination or scrolling. A lazy list is also an option but this isn't necessary because the bottleneck is on the frontend. 
 - Improve usability of the search bar by adding controls to enable/disable regex and case sensitivity. 
