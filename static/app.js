@@ -135,6 +135,7 @@ const handleOpenWorkClick = (event, query) => {
     .json()
     .then((results) => {
       Controller.updateTable(results, query);
+      document.getElementById("scroll-here").scrollIntoView()
     });
   })
 }

@@ -106,7 +106,7 @@ func handleReadWork(searcher Searcher) func(w http.ResponseWriter, r *http.Reque
 			w.Write([]byte("That paragraph is not part of a book. It belongs to the ending of the complete works. "))
 			return
 		}
-		allLines := getLinesByWorkId(workId, searcher, query)
+		allLines := getLinesByWorkId(workId, searcher, query, lineNumber)
 
 		results := []ResultParagraph{ResultParagraph{Paragraph: allLines}} // this is a slice because frontend expects an iterable
 		buf := &bytes.Buffer{}
@@ -133,7 +133,7 @@ func getWorkIdOfLine(lineNumber int) int {
 	return workId
 }
 
-func getLinesByWorkId(workId int, s Searcher, query string) []SearchLine {
+func getLinesByWorkId(workId int, s Searcher, query string, lineNumber int) []SearchLine {
 	allLines := []SearchLine{}
 	beginning := START_OF_WORKS
 	if workId != 0 {
@@ -142,7 +142,11 @@ func getLinesByWorkId(workId int, s Searcher, query string) []SearchLine {
 	end := END_OF_EACH_WORK[workId]
 
 	for i := beginning; i < end; i++ {
-		allLines = append(allLines, s.SearchLines[i].highlightRegexQuery(query))
+		currentLine := s.SearchLines[i].highlightRegexQuery(query)
+		if i == lineNumber {
+			currentLine = currentLine.addScrollId()
+		}
+		allLines = append(allLines, currentLine)
 	}
 	return allLines
 }
@@ -335,6 +339,13 @@ func (s *SearchLine) highlightQuery(query string) SearchLine {
 	newText := strings.ReplaceAll(s.TextResult, query, `<span style="color: #FD5F00;">`+query+`</span>`)
 	s.setTextResult(newText)
 	return *s
+}
+
+func (s *SearchLine) addScrollId() SearchLine {
+	return SearchLine{
+		TextResult: `<span id="scroll-here"> </span>` + s.TextResult,
+		LineIndex:  s.LineIndex,
+	}
 }
 
 func (s *SearchLine) highlightRegexQuery(query string) SearchLine {
