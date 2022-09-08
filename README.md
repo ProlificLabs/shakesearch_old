@@ -62,6 +62,7 @@ There are two types of future changes: (a) new features and (b) small usability 
 ### Usability Fixes
 
 - ~~When opening a book, it should automatically scroll to the last sentence of the snippet. This can be done by adding a `<span>` with id `scroll-here` on the backend. On the frontend, you can then programmatically scroll to the element with id `scroll-here`. ~~ I added this while waiting on my flight in the airport ;)
+- ~~There shouldn't be an `Open Book` button for the snippets that aren't part of any books (e.g introduction and license).~~ Fixed while at airport
 - Generally speaking, a user should always be able to undo their actions. With the current version, however, you can't go back if you open a book. This can be fixed by changing the stack history of the browser or by having a stack internally and overriding the behavior of the "back" button in the browser. 
 - When there are too many matches, it takes too long to insert the new lines at once. Instead it should show how many matches there are with either pagination or scrolling. A lazy list is also an option but this isn't necessary because the bottleneck is on the frontend. 
 - Improve usability of the search bar by adding controls to enable/disable regex and case sensitivity. 

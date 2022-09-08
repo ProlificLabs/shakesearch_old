@@ -110,9 +110,12 @@ const Controller = {
 
       // add link to read entire work
       const lineNumbers = card.parentElement.id.split("-");
-      const middleLine = Math.ceil((lineNumbers[0] + lineNumbers[1]) / 2)
-      const openWork = `<div class="open-work-wrapper"><button class="open-work">Open Book</button></div>`;
-      card.insertAdjacentHTML("beforeend", openWork)
+      const middleLine = Math.ceil((parseInt(lineNumbers[0]) + parseInt(lineNumbers[1])) / 2);
+      if (middleLine > 133 && middleLine < 169019) {
+        const openWork = `<div class="open-work-wrapper"><button class="open-work">Open Book</button></div>`;
+        card.insertAdjacentHTML("beforeend", openWork)
+      }
+      
 
       const openBookButtons = card.getElementsByClassName("open-work");
       for (let i = 0; i < openBookButtons.length; i++) {
