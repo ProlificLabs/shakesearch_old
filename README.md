@@ -46,7 +46,7 @@ You can see all the changes at https://shakesearch-max.herokuapp.com/. Throughou
 9. If users wanted to read an entire book, it would be *quite* annoying to constanly click to get the next 3 lines, which is why I added a button to show the full book of that particular snippet. 
 10. Added a spinner/loader so that it's obvious when results are loading.
 11. Added status messages if there are no results, and if there are errors on the backend. 
-12. When opening a book, it can be annoying that it brings you to the beginning of the book. Instead it should bring you as close as possible to where you were reading. I made it so that, when you open a book,  it scrolls to the last line of the snippet where you clicked to open it. (My reasoning was that the last line is likely the line that you read last. It's also the closest line to the button to open the book.)
+12. When opening a book, it can be annoying that it brings you to the beginning of the book. Instead, it should bring you as close as possible to where you were reading. I made it so that, when you open a book,  it scrolls to the last line of the snippet that you wanted to open. (My reasoning was that the last line is likely the line that you read last. It's also the closest line to the button to open the book.)
 
 ## Future Changes
 
@@ -55,14 +55,18 @@ There are two types of future changes: (a) new features and (b) small usability 
 ### New Features
 
 - Model that answers questions about the works of Shakespeare. E.g. someone could ask `How did "Romeo and Juliet" end?` and then the model would answer it. This could be done by fine-tuning OpenAI's GPT-3 on the works (although it probably already knows it), and then calling the prompts through their API. 
-- If users end up using it to read the works, they would probably want their reading progress to be saved. After all, it can be *quite* annoying to find where you left off. In order to do that, users should be able to login, and we should store their reading progress in a DB. 
+- If users end up using it to read the works, they would probably want their reading progress to be saved. After all, it can be *quite* annoying to have to look for where you left off. In order to do that, users should be able to login, and we should store their reading progress in a DB. 
 - Search suggestions and spelling suggestions in the way Google does it. (I.e. by having the suggestions drop down.)
 
 
 ### Usability Fixes
 
+<<<<<<< HEAD
 - ~~When opening a book, it should automatically scroll to the last sentence of the snippet. This can be done by adding a `<span>` with id `scroll-here` on the backend. On the frontend, you can then programmatically scroll to the element with id `scroll-here`. ~~ I added this while waiting on my flight in the airport ;)
 - ~~There shouldn't be an `Open Book` button for the snippets that aren't part of any books (e.g introduction and license).~~ Fixed while at airport
+=======
+- ~~When opening a book, it should automatically scroll to the last sentence of the snippet. This can be done by adding a `<span>` with id `scroll-here` on the backend. On the frontend, you can then programmatically scroll to the element with id `scroll-here`.~~ I added this while waiting on my flight in the airport ;)
+>>>>>>> a74ed7a4aaecd6389ccb37622fdd3588cddc6a91
 - Generally speaking, a user should always be able to undo their actions. With the current version, however, you can't go back if you open a book. This can be fixed by changing the stack history of the browser or by having a stack internally and overriding the behavior of the "back" button in the browser. 
 - When there are too many matches, it takes too long to insert the new lines at once. Instead it should show how many matches there are with either pagination or scrolling. A lazy list is also an option but this isn't necessary because the bottleneck is on the frontend. 
 - Improve usability of the search bar by adding controls to enable/disable regex and case sensitivity. 
