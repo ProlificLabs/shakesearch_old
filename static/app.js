@@ -89,7 +89,7 @@ const Controller = {
         button1.innerHTML = "...";
         button1.classList.add("add-lines");
         button1.addEventListener("click", function(event) {
-          handleAddLinesClick(event, true);
+          handleAddLinesClick(event, true, query);
         });
       } else {
         // delete button1
@@ -101,7 +101,7 @@ const Controller = {
         button2.innerHTML = "...";
         button2.classList.add("add-lines");
         button2.addEventListener("click", function(event) {
-          handleAddLinesClick(event, false);
+          handleAddLinesClick(event, false, query);
         });
       } else {
         // delete button1
@@ -155,11 +155,11 @@ const form = document.getElementById("form");
 form.addEventListener("submit", Controller.search);
 
 
-const handleAddLinesClick = (event, addLinesUp) => {
+const handleAddLinesClick = (event, addLinesUp, query) => {
   const wrapper = event.target.parentElement.parentElement
   wrapperId = wrapper.id;
   const lineIndexes = wrapperId.split("-");
-  const url = addLinesUp ? `/add-lines/up?q=${lineIndexes[0]}` : `/add-lines/down?q=${lineIndexes[1]}`;
+  const url = addLinesUp ? `/add-lines/up?line=${lineIndexes[0]}&q=${query}` : `/add-lines/down?line=${lineIndexes[1]}&q=${query}`;
 
   fetch(url).then((response) => {
     response

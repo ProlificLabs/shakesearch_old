@@ -154,7 +154,7 @@ func getLinesByWorkId(workId int, s Searcher, query string, lineNumber int) []Se
 func handleRequestAddLines(addLinesUp bool, searcher Searcher) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(r)
-		lineNumberList, ok := r.URL.Query()["q"]
+		lineNumberList, ok := r.URL.Query()["line"]
 		if !ok {
 			w.WriteHeader(http.StatusBadRequest)
 			w.Write([]byte("Wrong request, make sure to add query in URL."))
@@ -164,6 +164,13 @@ func handleRequestAddLines(addLinesUp bool, searcher Searcher) func(w http.Respo
 		if error != nil {
 			fmt.Println(error)
 		}
+		queryArray, ok2 := r.URL.Query()["q"]
+		if !ok2 {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte("Wrong request, make sure to add query in URL."))
+			return
+		}
+		query := queryArray[0]
 
 		if lineNumber >= AMOUNT_OF_LINES || lineNumber <= 0 {
 			w.WriteHeader(http.StatusBadRequest)
@@ -171,7 +178,7 @@ func handleRequestAddLines(addLinesUp bool, searcher Searcher) func(w http.Respo
 			return
 		}
 
-		extraLines := getExtraLines(addLinesUp, lineNumber, searcher)
+		extraLines := getExtraLines(addLinesUp, lineNumber, searcher, query)
 
 		buf := &bytes.Buffer{}
 		enc := json.NewEncoder(buf)
@@ -186,13 +193,13 @@ func handleRequestAddLines(addLinesUp bool, searcher Searcher) func(w http.Respo
 	}
 }
 
-func getExtraLines(addLinesUp bool, lineNumber int, searcher Searcher) []SearchLine {
+func getExtraLines(addLinesUp bool, lineNumber int, searcher Searcher, query string) []SearchLine {
 	extraLines := []SearchLine{}
 	for i := 1; i <= 3; i++ {
 		if addLinesUp && lineNumber-i >= 0 {
-			extraLines = append(extraLines, searcher.SearchLines[lineNumber-i])
+			extraLines = append(extraLines, searcher.SearchLines[lineNumber-i].highlightRegexQuery(query))
 		} else if !addLinesUp && lineNumber+i <= AMOUNT_OF_LINES {
-			extraLines = append(extraLines, searcher.SearchLines[lineNumber+i])
+			extraLines = append(extraLines, searcher.SearchLines[lineNumber+i].highlightRegexQuery(query))
 		}
 	}
 	return extraLines
