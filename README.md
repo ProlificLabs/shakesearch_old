@@ -47,6 +47,7 @@ You can see all the changes at https://shakesearch-max.herokuapp.com/. Throughou
 10. Added a spinner/loader so that it's obvious when results are loading.
 11. Added status messages if there are no results, and if there are errors on the backend. 
 12. When opening a book, it can be annoying that it brings you to the beginning of the book. Instead, it should bring you as close as possible to where you were reading. I made it so that, when you open a book,  it scrolls to the last line of the snippet that you wanted to open. (My reasoning was that the last line is likely the line that you read last. It's also the closest line to the button to open the book.)
+13. Did some small bug fixes. Namely, the `Open Book` button would appear on snippets that aren't part of a book (e.g. license description), and the query higlighting wouldn't work on the added lines after clicking `...`.
 
 ## Future Changes
 
