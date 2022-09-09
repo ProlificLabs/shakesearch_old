@@ -57,8 +57,8 @@ const Controller = {
     const searchList = document.getElementById("search-list");
     searchList.innerHTML = '';
     resultsShown = results;
-    if (results.length > 50) {
-      resultsShown = results.slice(0, 50);
+    if (results.length > 10) {
+      resultsShown = results.slice(0, 10);
     }
     lastElement = document.createElement("div");
     for (let result of resultsShown) {
@@ -79,7 +79,6 @@ const Controller = {
     }
 
     const endOfList = document.createElement("div");
-    endOfList.appendChild(document.createTextNode("..."))
     endOfList.setAttribute("id", "end-of-list");
     searchList.appendChild(endOfList);
 
@@ -103,11 +102,11 @@ const Controller = {
     const addMoreResults = () => {
       paginationState.pagination++;
       console.log("pagination: " + paginationState.pagination);
-      const beginning = paginationState.pagination * 50;
+      const beginning = paginationState.pagination * 10;
       let extraResults = results.slice(beginning)
       let noMoreResultsLeft = true;
-      if (extraResults.length > 50) {
-        extraResults = results.slice(beginning, beginning + 50);
+      if (extraResults.length > 10) {
+        extraResults = results.slice(beginning, beginning + 10);
         noMoreResultsLeft = false;
       }
       for (let result of extraResults) {
@@ -138,7 +137,6 @@ const Controller = {
         const endOfList = document.getElementById("end-of-list");
         endOfList.parentNode.removeChild(endOfList);
         let newEndOflist = document.createElement("div");
-        newEndOflist.appendChild(document.createTextNode("..."))
         newEndOflist.setAttribute("id", "end-of-list");
         searchList.appendChild(newEndOflist);
         onVisible(newEndOflist, () => addMoreResults(newEndOflist));
