@@ -63,12 +63,12 @@ There are two types of future changes: (a) new features and (b) small usability 
 
 - ~~When opening a book, it should automatically scroll to the last sentence of the snippet. This can be done by adding a `<span>` with id `scroll-here` on the backend. On the frontend, you can then programmatically scroll to the element with id `scroll-here`.~~ I added this while waiting on my flight in the airport ;)
 - ~~There shouldn't be an `Open Book` button for the snippets that aren't part of any books (e.g introduction and license).~~ Fixed while at airport
-- Generally speaking, a user should always be able to undo their actions. With the current version, however, you can't go back if you open a book. This can easily be done by changing to React, and using React Router or Nextjs.
+- Generally speaking, a user should always be able to undo their actions. With the current version, however, you can't go back if you open a book. This can easily be fixed by changing to React, and using React Router or Nextjs. 
 - Improve usability of the search bar by adding controls to enable/disable regex and case sensitivity. 
 - A/B test different versions of the UI. It could be that, instead of snippets, users prefer the full-text with controls to go to the next occurance of the match. (Ideally, one would also talk to users to check whether the data supports what they say they prefer)
 - If you scroll down too far, and then want to search again, it could be annoying to scroll all the way up. Instead, the search bar should drop down when scrolling up. 
 - Right now, if you want to add lines to the bottom of a snippet, you have to click the bottom `...`, move your mouse, click the bottom `...`, move your mouse, click the bottom `...`, and so on... Whereas with the top `...`, you never have to move your mouse. For the bottom one, it should automatically scroll down such that you don't have to move your mouse every time. 
 
-### How Would I Prioritize? 
+## How Would I Prioritize? 
 
 If there is something that the users complain about, then that would be my top priority, and it should be fixed immediatly. If there isn't an obvious painpoint, then I would first figure out what features the users are using because there is no point in improving a feature if no one uses it. Based on that, I would first fix all the usability issues in the most-used features. I believe that if they use a certain feature a lot, it is more important that that feature is of high quality (i.e. good usability) than adding a new feature. Or in other words: a small amount of high-quality features is better than a large amount of difficult-to-use features. 
