@@ -61,14 +61,9 @@ There are two types of future changes: (a) new features and (b) small usability 
 
 ### Usability Fixes
 
-<<<<<<< HEAD
-- ~~When opening a book, it should automatically scroll to the last sentence of the snippet. This can be done by adding a `<span>` with id `scroll-here` on the backend. On the frontend, you can then programmatically scroll to the element with id `scroll-here`. ~~ I added this while waiting on my flight in the airport ;)
-- ~~There shouldn't be an `Open Book` button for the snippets that aren't part of any books (e.g introduction and license).~~ Fixed while at airport
-=======
 - ~~When opening a book, it should automatically scroll to the last sentence of the snippet. This can be done by adding a `<span>` with id `scroll-here` on the backend. On the frontend, you can then programmatically scroll to the element with id `scroll-here`.~~ I added this while waiting on my flight in the airport ;)
->>>>>>> a74ed7a4aaecd6389ccb37622fdd3588cddc6a91
-- Generally speaking, a user should always be able to undo their actions. With the current version, however, you can't go back if you open a book. This can be fixed by changing the stack history of the browser or by having a stack internally and overriding the behavior of the "back" button in the browser. 
-- When there are too many matches, it takes too long to insert the new lines at once. Instead it should show how many matches there are with either pagination or scrolling. A lazy list is also an option but this isn't necessary because the bottleneck is on the frontend. 
+- ~~There shouldn't be an `Open Book` button for the snippets that aren't part of any books (e.g introduction and license).~~ Fixed while at airport
+- Generally speaking, a user should always be able to undo their actions. With the current version, however, you can't go back if you open a book. This can easily be done by changing to React, and using React Router or Nextjs.
 - Improve usability of the search bar by adding controls to enable/disable regex and case sensitivity. 
 - A/B test different versions of the UI. It could be that, instead of snippets, users prefer the full-text with controls to go to the next occurance of the match. (Ideally, one would also talk to users to check whether the data supports what they say they prefer)
 - If you scroll down too far, and then want to search again, it could be annoying to scroll all the way up. Instead, the search bar should drop down when scrolling up. 
