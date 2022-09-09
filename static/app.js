@@ -55,10 +55,14 @@ const Controller = {
 
   updateTable: (results, query) => {
     const searchList = document.getElementById("search-list");
-    searchList.innerHTML = ''
-    for (let result of results) {
+    searchList.innerHTML = '';
+    resultsShown = results;
+    if (results.length > 50) {
+      resultsShown = results.slice(0, 50);
+    }
+    lastElement = document.createElement("div");
+    for (let result of resultsShown) {
       const paragraph = result.Paragraph;
-
       
       let text = formatParagraph(paragraph);
       const firstLine = paragraph[0];
@@ -74,6 +78,73 @@ const Controller = {
       redundantPre.parentNode.removeChild(redundantPre);
     }
 
+    const endOfList = document.createElement("div");
+    endOfList.appendChild(document.createTextNode("..."))
+    endOfList.setAttribute("id", "end-of-list");
+    searchList.appendChild(endOfList);
+
+    function onVisible(element, callback) {
+      new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+          if(entry.intersectionRatio > 0) {
+            callback(element);
+            observer.disconnect();
+          }
+        });
+      }).observe(element);
+    }
+
+    let paginationState = {pagination: 0}
+
+    onVisible(endOfList, () => {
+      addMoreResults();
+    });
+
+    const addMoreResults = () => {
+      paginationState.pagination++;
+      console.log("pagination: " + paginationState.pagination);
+      const beginning = paginationState.pagination * 50;
+      let extraResults = results.slice(beginning)
+      let noMoreResultsLeft = true;
+      if (extraResults.length > 50) {
+        extraResults = results.slice(beginning, beginning + 50);
+        noMoreResultsLeft = false;
+      }
+      for (let result of extraResults) {
+        const paragraph = result.Paragraph;
+      
+        let text = formatParagraph(paragraph);
+        const firstLine = paragraph[0];
+        const lastLine = paragraph[paragraph.length - 1];
+
+        searchList.insertAdjacentHTML( 'beforeend', `<li id=${firstLine.LineIndex + "-" + lastLine.LineIndex}><div class="card added-${paginationState.pagination}">
+          <pre>${text}  <pre/>
+        <div/> <li/>`);
+        const preList = searchList.getElementsByTagName('pre')
+
+        // delete pre element that got added by joining <li> elements
+        const redundantPre = preList[preList.length - 1];
+        redundantPre.parentNode.removeChild(redundantPre);
+      } 
+
+      const addedCards = document.getElementsByClassName("added-" + paginationState.pagination);
+      for (let i = 0; i < addedCards.length; i++) {
+        const addedCard = addedCards[i]
+        addExtraLinesButtons(addedCard, query);
+        addOpenBookButtons(addedCard, query);
+      }
+
+      if (!noMoreResultsLeft) {
+        const endOfList = document.getElementById("end-of-list");
+        endOfList.parentNode.removeChild(endOfList);
+        let newEndOflist = document.createElement("div");
+        newEndOflist.appendChild(document.createTextNode("..."))
+        newEndOflist.setAttribute("id", "end-of-list");
+        searchList.appendChild(newEndOflist);
+        onVisible(newEndOflist, () => addMoreResults(newEndOflist));
+      }
+    }
+
     const cards = document.getElementsByClassName("card");
     for (let i = 0; i < cards.length; i++) {
 
@@ -81,51 +152,60 @@ const Controller = {
       let button2 = document.createElement("button");
 
       const card = cards[i]
-      card.insertBefore(button1, card.firstChild)
-      card.appendChild(button2)
-
-
-      if (cards[i].parentElement.id.split("-")[0] !== "0") {
-        button1.innerHTML = "...";
-        button1.classList.add("add-lines");
-        button1.addEventListener("click", function(event) {
-          handleAddLinesClick(event, true, query);
-        });
-      } else {
-        // delete button1
-        button1.parentNode.removeChild(button1);
-      }
-
-      
-      if (parseInt(cards[i].parentElement.id.split("-")[1]) < 169432) {
-        button2.innerHTML = "...";
-        button2.classList.add("add-lines");
-        button2.addEventListener("click", function(event) {
-          handleAddLinesClick(event, false, query);
-        });
-      } else {
-        // delete button1
-        button2.parentNode.removeChild(button2);
-      }
-
-      // add link to read entire work
-      const lineNumbers = card.parentElement.id.split("-");
-      const middleLine = Math.ceil((parseInt(lineNumbers[0]) + parseInt(lineNumbers[1])) / 2);
-      if (middleLine > 133 && middleLine < 169019) {
-        const openWork = `<div class="open-work-wrapper"><button class="open-work">Open Book</button></div>`;
-        card.insertAdjacentHTML("beforeend", openWork)
-      }
-      
-
-      const openBookButtons = card.getElementsByClassName("open-work");
-      for (let i = 0; i < openBookButtons.length; i++) {
-        openBookButtons[i].addEventListener("click", (event) => {
-          handleOpenWorkClick(event, query);
-        })
-      }
+      addExtraLinesButtons(card, query);
+      addOpenBookButtons(card, query);
     }
   },
 };
+
+const addExtraLinesButtons = (card, query) => {
+  let button1 = document.createElement("button");
+  let button2 = document.createElement("button");
+
+  card.insertBefore(button1, card.firstChild)
+  card.appendChild(button2)
+
+
+  if (card.parentElement.id.split("-")[0] !== "0") {
+    button1.innerHTML = "...";
+    button1.classList.add("add-lines");
+    button1.addEventListener("click", function(event) {
+      handleAddLinesClick(event, true, query);
+    });
+  } else {
+    // delete button1
+    button1.parentNode.removeChild(button1);
+  }
+
+  
+  if (parseInt(card.parentElement.id.split("-")[1]) < 169432) {
+    button2.innerHTML = "...";
+    button2.classList.add("add-lines");
+    button2.addEventListener("click", function(event) {
+      handleAddLinesClick(event, false, query);
+    });
+  } else {
+    // delete button2
+    button2.parentNode.removeChild(button2);
+  }
+}
+
+const addOpenBookButtons = (card, query) => {
+  const lineNumbers = card.parentElement.id.split("-");
+  const middleLine = Math.ceil((parseInt(lineNumbers[0]) + parseInt(lineNumbers[1])) / 2);
+  if (middleLine > 133 && middleLine < 169019) {
+    const openWork = `<div class="open-work-wrapper"><button class="open-work">Open Book</button></div>`;
+    card.insertAdjacentHTML("beforeend", openWork)
+  }
+  
+
+  const openBookButtons = card.getElementsByClassName("open-work");
+  for (let i = 0; i < openBookButtons.length; i++) {
+    openBookButtons[i].addEventListener("click", (event) => {
+      handleOpenWorkClick(event, query);
+    })
+  }
+}
 
 const handleOpenWorkClick = (event, query) => {
   const startAndEndId = event.target.parentElement.parentElement.parentElement.id.split("-");
