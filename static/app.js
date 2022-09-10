@@ -15,7 +15,11 @@ const Controller = {
     ev.preventDefault();
     const form = document.getElementById("form");
     const data = Object.fromEntries(new FormData(form));
-    const response = fetch(`/search?q=${data.query}`).then((response) => {
+    console.log(document.getElementById("ignorePunctuation").checked)
+    const ignorePunctuation = document.getElementById("ignorePunctuation").checked;
+    console.log(document.getElementById("caseSensitive").checked)
+    const useCaseSensitive = document.getElementById("caseSensitive").checked
+    const response = fetch(`/search?q=${data.query}&casesensitive=${useCaseSensitive}&ignorepunctuation=${ignorePunctuation}`).then((response) => {
       response.json().then((results) => {
         if (results.length === 0) {
           const statusInfo = document.getElementById("status-info");

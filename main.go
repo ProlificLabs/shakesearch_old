@@ -214,7 +214,36 @@ func handleSearch(searcher Searcher) func(w http.ResponseWriter, r *http.Request
 			w.Write([]byte("missing search query in URL params"))
 			return
 		}
-		results := searcher.SearchWithRegex(query[0])
+		ignorePunctuationArray, ok2 := r.URL.Query()["ignorepunctuation"]
+		if !ok2 {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte("missing ignorePunctuation in URL params"))
+			return
+		}
+		ignorePunctuation, error := strconv.ParseBool(ignorePunctuationArray[0])
+		if error != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte("ignorePunctuation in URL params is not a boolean value"))
+			return
+		}
+		fmt.Println("ignorePunctuation")
+		fmt.Println(ignorePunctuation)
+		useCaseSensitiveArray, ok3 := r.URL.Query()["casesensitive"]
+		if !ok3 {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte("missing regexOption in URL params"))
+			return
+		}
+		useCaseSensitive, error2 := strconv.ParseBool(useCaseSensitiveArray[0])
+		if error2 != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte("casesensitive in URL params is not a boolean value"))
+			return
+		}
+		fmt.Print("useCaseSensitive: ")
+		fmt.Println(useCaseSensitive)
+		results := searcher.SearchWithRegex(query[0], useCaseSensitive, ignorePunctuation)
+		// results := searcher.SearchWithRegex(query[0], useCaseSensitive)
 		buf := &bytes.Buffer{}
 		enc := json.NewEncoder(buf)
 		err := enc.Encode(results)
@@ -270,7 +299,37 @@ func loadLinesInfo(filename string) ([]SearchLine, []int) {
 	return lines, endOfLineIndexes
 }
 
-func (s *Searcher) SearchWithRegex(query string) []ResultParagraph {
+func (s *Searcher) searchWithoutRegex(query string) []ResultParagraph {
+	idxs := s.SuffixArray.Lookup([]byte(query), -1)
+	resultIdxs := [][]int{}
+	queryLength := len(query)
+	for _, idx := range idxs {
+		resultIdxs = append(resultIdxs, []int{idx, idx + queryLength})
+	}
+	allSearchLineIdxs := getSearchLinesByIndex(resultIdxs, s)
+	allParagraphs := makeParagraphsOutOfLines(allSearchLineIdxs, s, query)
+	return allParagraphs
+}
+
+func (s *Searcher) SearchWithRegex(query string, useCaseSensitive bool, ignorePunctuation bool) []ResultParagraph {
+	if (len(query) >= 4) && !useCaseSensitive {
+		fmt.Println("query first 4 letters: " + query[:4])
+		fmt.Println(query[4:])
+		if query[:4] != "(?i)" {
+			query = "(?i)" + query
+		}
+	} else if len(query) < 4 && !useCaseSensitive {
+		query = "(?i)" + query
+	}
+
+	if ignorePunctuation && useCaseSensitive {
+		querySlice := strings.Split(query, "")
+		query = `[.,!;:]?` + strings.Join(querySlice, `[.,!;:]?`) + `[.,!;:]?`
+	} else if ignorePunctuation && !useCaseSensitive {
+		querySlice := strings.Split(query[4:], "")
+		query = query[:4] + `[.,!;:]?` + strings.Join(querySlice, `[.,!;:]?`) + `[.,!;:]?`
+	}
+	fmt.Println("query: " + query)
 	re := regexp.MustCompile(query)
 	restultIndeces := re.FindAllStringIndex(s.CompleteWorks, -1)
 	allSearchLinesIndeces := getSearchLinesByIndex(restultIndeces, s)
@@ -366,4 +425,12 @@ func (s *SearchLine) highlightRegexQuery(query string) SearchLine {
 		TextResult: newText,
 		LineIndex:  s.LineIndex,
 	}
+}
+
+func makeQueryCaseInsensitive(query string) string {
+	newQuery := query
+	if query[:5] != "(?i)" {
+		newQuery = "(?i)" + query
+	}
+	return newQuery
 }

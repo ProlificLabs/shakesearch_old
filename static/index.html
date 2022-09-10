@@ -15,6 +15,14 @@
             <!-- <label for="query">Query</label> -->
             <div class="search-bar">
               <input type="text" class="search-input" id="query" name="query" placeholder="Enter your query">
+              <div class="search-options-wrapper">
+                <img src="/images/icons8-option-24.png" style="color: #fd5f00">
+                <div class="popup-options-menu">
+                  <input type="checkbox" id="ignorePunctuation" checked><label for="ignorePunctuation">Ignore Punctuation</label>
+                  <input type="checkbox" id="caseSensitive"><label for="caseSensitive">Case Sensitive</label>
+                </div>
+                
+              </div>
               <div class="explanation-wrapper tooltip">
                 <i class="fa-solid fa-question" style="color: #fd5f00"></i>
                 <span class="tooltiptext">Search for keywords or match patterns using <a href="https://ubuntu.com/blog/regex-basics#how-to-use-regex">Regex</a>.</span>
