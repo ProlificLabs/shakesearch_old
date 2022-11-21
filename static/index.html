@@ -4,24 +4,32 @@
 <head>
   <meta charset="utf-8">
   <title>ShakeSearch</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="search.css">
   <meta name="theme-color" content="#fafafa">
 </head>
 
 <body>
-    <p>
-        <form id="form">
-            <label for="query">Query</label>
-            <input type="text" id="query" name="query">
-            <button type="submit">Search</button>
-        </form>
-    </p>
-    <p>
-        <table id="table">
-          <tbody id="table-body"></tbody>
-        </table>
-    </p>
+  <header>
+    <h1 id="shake-search-title" class="medieval">ShakeSearch</h1>
+  </header>
+  <div id="form-container">
+    <form id="form">
+      <label for="query">Query: </label>
+      <input type="text" id="query" name="query">
+      <button class="submit-button" type="submit" onClick="scroll">Search</button><span id="settings-icon">⚙</span>
+    </form>
+  </div>
+  <div id="quotes-container">
+    <div id="results-summary"></div>
+    <ul id="quote-list"></ul>
+  </div>
   <script src="app.js"></script>
+  <!-- Elasticsearch Helper: https://fusejs.io/ -->
+  <script src="https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.js"></script>
 </body>
 
 </html>

@@ -1,0 +1,77 @@
+body {
+  font-family: 'Droid Sans Mono', sans-serif;
+}
+
+header {
+  margin-top: 10vh;
+}
+
+label {
+  color: dimgray;
+  font-size: 14px;
+}
+
+.medieval {
+  font-family: 'MedievalSharp', cursive;
+}
+
+#shake-search-title {
+  font-size: 50px;
+  text-align: center;
+}
+
+#form-container {
+  text-align: center;
+}
+
+#query {
+  padding: 5px;
+  border-radius: 4px;
+  border: 1px solid lightgray;
+  width: 18%;
+}
+
+.submit-button {
+  border: 1px solid forestgreen;
+  padding: 5px 20px;
+  border-radius: 4px;
+  background-color: darkolivegreen;
+  color: white;
+}
+
+.submit-button:hover {
+  background-color: olive;
+  cursor: pointer;
+}
+
+#results-summary {
+  text-align: center;
+  font-size: 14px;
+  margin: 10px 0;
+}
+
+#quote-list {
+  font-family: "MedievalSharp";
+  list-style-type: none;
+  text-align: center;
+  padding: 0;
+  max-height: 800px;
+  overflow-y: scroll;
+  width: 50%;
+  margin: auto;
+}
+
+.quote {
+  text-transform: capitalize;
+  white-space: pre-wrap;
+  background: beige;
+  padding: 20px;
+  margin: 20px 0;
+}
+
+#settings-icon {
+  padding: 5px;
+  font-size: 24px;
+  vertical-align: middle;
+  cursor: pointer;
+}
