@@ -28,7 +28,6 @@ const Controller = {
     const summary = document.getElementById("results-summary");
     const rows = results.map(result => `<li class="quote">...${result}...<li/>`)
     const sanitizedRows = rows.join("");
-    console.log(sanitizedRows);
     list.innerHTML = sanitizedRows;
     summary.innerHTML = `Search Results: (${rows.length})`
   },
@@ -36,3 +35,4 @@ const Controller = {
 
 const form = document.getElementById("form");
 form.addEventListener("submit", Controller.search);
+
