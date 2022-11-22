@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 )
 
 func main() {
@@ -73,10 +74,35 @@ func (s *Searcher) Load(filename string) error {
 }
 
 func (s *Searcher) Search(query string) []string {
-	idxs := s.SuffixArray.Lookup([]byte(query), -1)
+	capitalizedQuery := strings.ToTitle(query)
+	uppercaseQuery := strings.ToUpper(query)
+	lowercaseQuery := strings.ToUpper(query)
+	idxs := s.SuffixArray.Lookup([]byte(strings.ToUpper(query)), -1)
+	// andrralv: Lookup is O(n) so performance is not an issue vv
+	idxsUpper := s.SuffixArray.Lookup([]byte(strings.ToUpper(uppercaseQuery)), -1)
+	idxsLower := s.SuffixArray.Lookup([]byte(strings.ToUpper(lowercaseQuery)), -1)
+	idxsTitle := s.SuffixArray.Lookup([]byte(strings.ToUpper(capitalizedQuery)), -1)
+	idxs = append(idxs, idxsUpper...)
+	idxs = append(idxs, idxsLower...)
+	idxs = append(idxs, idxsTitle...)
+	idxs = removeDuplicates(idxs)
 	results := []string{}
 	for _, idx := range idxs {
 		results = append(results, s.CompleteWorks[idx-250:idx+250])
 	}
 	return results
+}
+
+func removeDuplicates(slc []int) []int {
+	var withDuplicatesRemoved []int
+	chkMap := make(map[int]bool)
+	// andrralv: making a map removes duplicates
+	for _, val := range slc {
+		chkMap[val] = true
+	}
+	// andrralv: transform back to slice
+	for k, _ := range chkMap {
+		withDuplicatesRemoved = append(withDuplicatesRemoved, k)
+	}
+	return withDuplicatesRemoved
 }

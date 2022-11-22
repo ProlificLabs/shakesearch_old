@@ -19,17 +19,18 @@
   <div id="form-container">
     <form id="form">
       <label for="query">Query: </label>
-      <input type="text" id="query" name="query">
+      <input type="search" id="query" name="query">
       <button class="submit-button" type="submit" onClick="scroll">Search</button><span id="settings-icon">⚙</span>
     </form>
   </div>
   <div id="quotes-container">
     <div id="results-summary"></div>
+    <div id="suggest-search"></div>
     <ul id="quote-list"></ul>
   </div>
   <script src="app.js"></script>
-  <!-- Elasticsearch Helper: https://fusejs.io/ -->
-  <script src="https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.js"></script>
+  <!-- https://github.com/cfinke/Typo.js -->
+  <script src="lib/typo/typo.js"></script>
 </body>
 
 </html>
