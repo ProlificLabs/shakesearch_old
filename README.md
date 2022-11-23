@@ -5,7 +5,7 @@ you'll find a simple web app that allows a user to search for a text string in
 the complete works of Shakespeare.
 
 You can see a live version of the app at
-https://pulley-shakesearch.herokuapp.com/. Try searching for "Hamlet" to display
+https://pulley-shakesearch.onrender.com/. Try searching for "Hamlet" to display
 a set of results.
 
 In it's current state, however, the app is in rough shape. The search is
@@ -26,6 +26,5 @@ We will be primarily evaluating based on how well the search works for users. A 
 ## Submission
 
 1. Fork this repository and send us a link to your fork after pushing your changes.
-2. Heroku hosting - The project includes a Heroku Procfile and, in its
-   current state, can be deployed easily on Heroku's free tier.
+2. Render (render.com) hosting, the application deploys cleanly from a public url.
 3. In your submission, share with us what changes you made and how you would prioritize changes if you had more time.
