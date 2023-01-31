@@ -1,0 +1,13 @@
+@use "assets/style/color";
+
+.root {
+  list-style-type: none;
+}
+
+.item {
+  margin-bottom: 16px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}

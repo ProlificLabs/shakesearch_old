@@ -1,0 +1,30 @@
+@use "assets/style/color";
+@use "assets/style/media";
+
+.root {
+  display: flex;
+  padding: 16px;
+  min-height: 100vh;
+  justify-content: center;
+  background-color: color.$neutral-100;
+}
+
+.container {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+
+  @media (min-width: media.$screen-md) {
+    max-width: 640px;
+  }
+}
+
+.logo {
+  margin-bottom: 16px;
+}
+
+.searchForm {
+  width: 100%;
+  margin-bottom: 40px;
+}
