@@ -1,0 +1,33 @@
+@use "assets/style/color";
+@use "assets/style/media";
+@use "assets/style/normalize";
+
+html {
+  box-sizing: border-box;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: Roboto, sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  letter-spacing: normal;
+  line-height: 1.35;
+  text-transform: none;
+  text-decoration: none;
+  background: color.$white;
+  color: color.$neutral-900;
+
+  @media (min-width: media.$screen-md) {
+    font-size: 1.25rem;
+    line-height: 1.55;
+  }
+}
+
+p,
+ul {
+  margin: 0;
+  padding: 0;
+}
