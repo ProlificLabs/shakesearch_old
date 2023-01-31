@@ -13,7 +13,7 @@ import (
 
 func main() {
 	searcher := Searcher{}
-	err := searcher.Load("completeworks.txt")
+	err := searcher.Load("data/completeworks.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
