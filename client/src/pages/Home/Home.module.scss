@@ -1,0 +1,39 @@
+@use "assets/style/media";
+
+$padding-top-sm: 100px;
+$padding-top-md: 200px;
+
+.root {
+  display: flex;
+  justify-content: center;
+  padding: $padding-top-sm 16px 0;
+  min-height: calc(100vh - $padding-top-sm);
+
+  @media (min-width: media.$screen-sm) {
+    padding-top: $padding-top-md;
+    min-height: calc(100vh - $padding-top-md);
+  }
+}
+
+.container {
+  width: 100%;
+  display: flex;
+  max-width: 480px;
+  align-items: center;
+  flex-direction: column;
+}
+
+.logo {
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.searchForm {
+  width: 100%;
+  max-width: 480px;
+  margin-bottom: 32px;
+}

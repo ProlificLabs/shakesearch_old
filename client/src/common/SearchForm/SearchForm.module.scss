@@ -1,0 +1,27 @@
+@use "assets/style/color";
+
+.root {
+  display: flex;
+  border-radius: 8px;
+  border: 1px solid color.$neutral-500;
+}
+
+.textInputRoot {
+  width: 100%;
+}
+
+.textInputField {
+  width: 100%;
+  border: none;
+}
+
+.action {
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+
+  &:hover,
+  &:active {
+    color: color.$white;
+    background-color: color.$primary;
+  }
+}

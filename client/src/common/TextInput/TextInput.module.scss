@@ -1,0 +1,19 @@
+@use "assets/style/color";
+
+.root {
+  display: flex;
+  flex-direction: column;
+}
+
+.input {
+  padding: 12px;
+  border-width: 1px;
+  border-radius: 8px;
+  border-color: color.$neutral-500;
+}
+
+.error {
+  margin-top: 8px;
+  font-size: 0.85em;
+  color: color.$critical;
+}

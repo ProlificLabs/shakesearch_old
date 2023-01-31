@@ -1,0 +1,9 @@
+@use "assets/style/color";
+
+.root {
+  padding: 16px;
+  border-radius: 8px;
+  background-color: color.$white;
+  border: 1px solid color.$neutral-100;
+  box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.2);
+}
