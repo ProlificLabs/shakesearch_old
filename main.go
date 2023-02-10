@@ -15,7 +15,6 @@ import (
 	// "text/template"
 )
 
-const resultsPerPage = 25
 
 func main() {
 	searcher := Searcher{}
@@ -45,6 +44,8 @@ type Searcher struct {
 	CompleteWorks string
 	SuffixArray   *suffixarray.Index
 }
+var cache = make(map[string][]string)
+var stopWords = []string{"a", "an", "and", "are", "as", "at", "be", "but", "by", "for", "if", "in", "into", "is", "it", "no", "not", "of", "on", "or", "such", "that", "the", "their", "then", "there", "these", "they", "this", "to", "was", "will", "with"}
 
 func handleSearch(searcher Searcher) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -55,7 +56,15 @@ func handleSearch(searcher Searcher) func(w http.ResponseWriter, r *http.Request
 			return
 		}
 		normalizedQuery := normalizeQuery(query[0])
-		results := searcher.Search(normalizedQuery)
+		//Adding cache map to imrove subsequent search queries
+		var results []string
+		if cachedResults, ok := cache[normalizedQuery]; ok {
+		results = cachedResults
+		} else {
+		results = searcher.Search(normalizedQuery)
+		cache[normalizedQuery] = results
+		}
+		//results := searcher.Search(normalizedQuery)
 		buf := &bytes.Buffer{}
 		enc := json.NewEncoder(buf)
 		err := enc.Encode(results)
@@ -69,11 +78,39 @@ func handleSearch(searcher Searcher) func(w http.ResponseWriter, r *http.Request
 	}
 }
 
-// 1.Handles Query Normalization
+
+
+// 1.Handles Query Normalization and removes the stop words
 func normalizeQuery(query string) string {
+	// Convert the query to lowercase
 	query = strings.ToLower(query)
+	// Trim any leading or trailing whitespace
 	query = strings.TrimSpace(query)
-	return query
+	// Split the query into individual words
+	words := strings.Split(query, " ")
+	// Create a new slice to store the filtered words
+	filteredWords := []string{}
+	// Loop through each word in the query
+	for _, word := range words {
+		// Check if the word is not a stop word
+		if !isStopWord(word) {
+			filteredWords = append(filteredWords, word)
+		}
+	}
+	// Join the filtered words back into a single string
+	return strings.Join(filteredWords, " ")
+}
+
+func isStopWord(word string) bool {
+	// Loop through each stop word
+	for _, stopWord := range stopWords {
+		// If the word matches a stop word, return true
+		if word == stopWord {
+			return true
+		}
+	}
+	// If the word does not match any stop words, return false
+	return false
 }
 
 func (s *Searcher) Load(filename string) error {
