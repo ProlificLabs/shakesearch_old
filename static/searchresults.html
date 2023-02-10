@@ -1,0 +1,30 @@
+//searchresults.tmpl file
+
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Search Results</title>
+</head>
+<body>
+	<h1>Search Results</h1>
+	<div>
+		{{range $idx, $result := .Results}}
+			<p>{{$result}}</p>
+		{{end}}
+	</div>
+	{{if .HasPrevious}}
+		<a href="?q={{.Query}}&page={{.PreviousPage}}">Previous</a>
+	{{end}}
+	{{if .HasNext}}
+		<a href="?q={{.Query}}&page={{.NextPage}}">Next</a>
+	{{end}}
+	<br><br>
+	<form action="/search" method="get">
+		<input type="text" name="q" value="{{.Query}}">
+		<input type="submit" value="Search">
+	</form>
+</body>
+</html>
+
+

@@ -9,7 +9,13 @@ import (
 	"log"
 	"net/http"
 	"os"
+
+	//	"strconv"
+	"strings"
+	// "text/template"
 )
+
+const resultsPerPage = 25
 
 func main() {
 	searcher := Searcher{}
@@ -48,7 +54,8 @@ func handleSearch(searcher Searcher) func(w http.ResponseWriter, r *http.Request
 			w.Write([]byte("missing search query in URL params"))
 			return
 		}
-		results := searcher.Search(query[0])
+		normalizedQuery := normalizeQuery(query[0])
+		results := searcher.Search(normalizedQuery)
 		buf := &bytes.Buffer{}
 		enc := json.NewEncoder(buf)
 		err := enc.Encode(results)
@@ -62,6 +69,13 @@ func handleSearch(searcher Searcher) func(w http.ResponseWriter, r *http.Request
 	}
 }
 
+// 1.Handles Query Normalization
+func normalizeQuery(query string) string {
+	query = strings.ToLower(query)
+	query = strings.TrimSpace(query)
+	return query
+}
+
 func (s *Searcher) Load(filename string) error {
 	dat, err := ioutil.ReadFile(filename)
 	if err != nil {
@@ -73,10 +87,16 @@ func (s *Searcher) Load(filename string) error {
 }
 
 func (s *Searcher) Search(query string) []string {
+	// Normalize the query string by converting to lowercase
+	query = strings.ToLower(query)
+
 	idxs := s.SuffixArray.Lookup([]byte(query), -1)
 	results := []string{}
 	for _, idx := range idxs {
-		results = append(results, s.CompleteWorks[idx-250:idx+250])
+		match := s.CompleteWorks[idx-250 : idx+250]
+		// 2. Bold Italicisizing the match
+		match = strings.ReplaceAll(match, query, "<h3 style='color:#2996e8;font-weight:bold,font-size:20px'><i>"+query+"</i></h3>")
+		results = append(results, match)
 	}
 	return results
 }
