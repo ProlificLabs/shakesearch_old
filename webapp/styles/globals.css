@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.highlight {
+  background-color: #f9e5d1;
+  font-style: normal;
+  color: black;
+}
