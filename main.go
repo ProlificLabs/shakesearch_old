@@ -10,7 +10,6 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
-	"os"
 	"sort"
 	"strings"
 )
@@ -31,13 +30,7 @@ func main() {
 
 	http.HandleFunc("/search", handleSearch(searcher))
 
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "3001"
-	}
-
-	fmt.Printf("Listening on port %s...", port)
-	err = http.ListenAndServe(fmt.Sprintf(":%s", port), nil)
+	err = http.ListenAndServe(":8080", nil)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -72,13 +65,17 @@ func handleSearch(searcher Searcher) func(w http.ResponseWriter, r *http.Request
 			w.Write([]byte("encoding failure"))
 			return
 		}
+		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(buf.Bytes())
 	}
 }
 
 func sanitize(s string) string {
-	return strings.ReplaceAll(s, "\"", "")
+	s = strings.ReplaceAll(s, "\"", "")
+	s = strings.ReplaceAll(s, "\r", "")
+	s = strings.ReplaceAll(s, "\n", "")
+	return s
 }
 
 func (s *Searcher) Load(filename string) error {
@@ -101,6 +98,8 @@ type SearchResult struct { // this is the struct that will be returned as json
 	SceneNumber int    `json:"scene_number"` // these are not computed and random numbers are returned for now
 }
 
+const charsCoverage = 250
+
 func (s *Searcher) Search(query string) []SearchResult {
 	queries := strings.Split(query, " ")
 	queries = append(queries, query)
@@ -111,10 +110,11 @@ func (s *Searcher) Search(query string) []SearchResult {
 	}
 	var results []SearchResult
 	results = make([]SearchResult, 0)
+
 	for _, idx := range finalIndexes {
 		playName := s.findPlayName(idx)
-		line := s.CompleteWorks[idx-50 : idx+50]
-		results = append(results, SearchResult{Line: line, PlayName: playName, ActNumber: rand.Int()%5 + 1, SceneNumber: rand.Int()%5 + 1})
+		line := s.CompleteWorks[idx-charsCoverage : idx+charsCoverage]
+		results = append(results, SearchResult{Line: sanitize(line), PlayName: playName, ActNumber: rand.Int()%5 + 1, SceneNumber: rand.Int()%5 + 1})
 	}
 	return results
 }
