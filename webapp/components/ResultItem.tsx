@@ -10,7 +10,6 @@ const transformHTML = (value: string, query: string) => {
   const words = query
     .split(" ")
     .filter((value, index, array) => array.indexOf(value) === index);
-  console.log({ value });
   let transformedHtml = (value || "").toString();
   words.forEach((word) => {
     var re = new RegExp(word, "ig");
