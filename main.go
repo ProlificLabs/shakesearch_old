@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 )
 
 func main() {
@@ -44,12 +45,14 @@ type Searcher struct {
 func handleSearch(searcher Searcher) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		query, ok := r.URL.Query()["q"]
-		if !ok || len(query[0]) < 1 {
+		sanitizedQuery := sanitize(query[0])
+		fmt.Printf("query: %s, sanitized: %s\n", query[0], sanitizedQuery)
+		if !ok || len(sanitizedQuery) < 1 {
 			w.WriteHeader(http.StatusBadRequest)
 			w.Write([]byte("missing search query in URL params"))
 			return
 		}
-		results := searcher.Search(query[0])
+		results := searcher.Search(sanitizedQuery)
 		fmt.Println(len(results))
 		buf := &bytes.Buffer{}
 		enc := json.NewEncoder(buf)
@@ -64,6 +67,10 @@ func handleSearch(searcher Searcher) func(w http.ResponseWriter, r *http.Request
 	}
 }
 
+func sanitize(s string) string {
+	return strings.ReplaceAll(s, "\"", "")
+}
+
 func (s *Searcher) Load(filename string) error {
 	dat, err := ioutil.ReadFile(filename)
 	if err != nil {
@@ -76,9 +83,14 @@ func (s *Searcher) Load(filename string) error {
 }
 
 func (s *Searcher) Search(query string) []string {
-	idxs := s.LowerSuffixArray.Lookup(bytes.ToLower([]byte(query)), -1)
-	results := []string{}
-	for _, idx := range idxs {
+	queries := strings.Split(query, " ")
+	finalIndexes := []int{}
+	for _, query := range queries {
+		idxs := s.LowerSuffixArray.Lookup(bytes.ToLower([]byte(query)), -1)
+		finalIndexes = append(finalIndexes, idxs...)
+	}
+	var results []string
+	for _, idx := range finalIndexes {
 		results = append(results, s.CompleteWorks[idx-250:idx+250])
 	}
 	return results
