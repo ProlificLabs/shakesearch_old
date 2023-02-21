@@ -36,8 +36,9 @@ func main() {
 }
 
 type Searcher struct {
-	CompleteWorks string
-	SuffixArray   *suffixarray.Index
+	CompleteWorks    string
+	SuffixArray      *suffixarray.Index
+	LowerSuffixArray *suffixarray.Index
 }
 
 func handleSearch(searcher Searcher) func(w http.ResponseWriter, r *http.Request) {
@@ -49,6 +50,7 @@ func handleSearch(searcher Searcher) func(w http.ResponseWriter, r *http.Request
 			return
 		}
 		results := searcher.Search(query[0])
+		fmt.Println(len(results))
 		buf := &bytes.Buffer{}
 		enc := json.NewEncoder(buf)
 		err := enc.Encode(results)
@@ -68,12 +70,13 @@ func (s *Searcher) Load(filename string) error {
 		return fmt.Errorf("Load: %w", err)
 	}
 	s.CompleteWorks = string(dat)
-	s.SuffixArray = suffixarray.New(dat)
+	lowerData := string(bytes.ToLower(dat))
+	s.LowerSuffixArray = suffixarray.New([]byte(lowerData))
 	return nil
 }
 
 func (s *Searcher) Search(query string) []string {
-	idxs := s.SuffixArray.Lookup([]byte(query), -1)
+	idxs := s.LowerSuffixArray.Lookup(bytes.ToLower([]byte(query)), -1)
 	results := []string{}
 	for _, idx := range idxs {
 		results = append(results, s.CompleteWorks[idx-250:idx+250])
