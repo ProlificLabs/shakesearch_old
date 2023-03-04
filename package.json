@@ -1,0 +1,37 @@
+{
+	"name": "shakesearch",
+	"version": "1.0.0",
+	"description": "Welcome to the Pulley Shakesearch Take-home Challenge! In this repository, you'll find a simple web app that allows a user to search for a text string in the complete works of Shakespeare.",
+	"main": "index.js",
+	"scripts": {
+		"dev": "node esbuild.js",
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"lint": "eslint \"client/*.{ts,tsx}\" --fix"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/iamseye/shakesearch.git"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/iamseye/shakesearch/issues"
+	},
+	"homepage": "https://github.com/iamseye/shakesearch#readme",
+	"dependencies": {
+		"react": "^18.2.0",
+		"react-dom": "^18.2.0"
+	},
+	"devDependencies": {
+		"@types/react": "^18.0.28",
+		"@types/react-dom": "^18.0.11",
+		"@typescript-eslint/eslint-plugin": "^5.54.0",
+		"@typescript-eslint/parser": "^5.54.0",
+		"esbuild": "^0.17.11",
+		"eslint": "^8.35.0",
+		"eslint-plugin-react": "^7.32.2",
+		"prettier": "^2.8.4",
+		"tailwindcss": "^3.2.7"
+	}
+}
