@@ -6,7 +6,7 @@ export const SearchBox = React.memo(({ setSearchQuery }) => {
   const onSubmit = (event) => {
     event.preventDefault();
     if (searchValue) {
-      setSearchQuery(searchValue);
+      setSearchQuery(searchValue.trim());
     }
   };
 

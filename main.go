@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 )
 
 func main() {
@@ -71,16 +72,34 @@ func (s *Searcher) Load(filename string) error {
 	if err != nil {
 		return fmt.Errorf("Load: %w", err)
 	}
-	s.CompleteWorks = string(dat)
-	s.SuffixArray = suffixarray.New(dat)
+	var datString = string(dat)
+	s.CompleteWorks = datString
+	s.SuffixArray = suffixarray.New([]byte(strings.ToLower(datString)))
 	return nil
 }
 
 func (s *Searcher) Search(query string) []string {
-	idxs := s.SuffixArray.Lookup([]byte(query), -1)
+	if len(query) > 100 {
+		query = query[:100]
+	}	
+
+	idxs := s.SuffixArray.Lookup([]byte(strings.ToLower(query)), -1)
+
 	results := []string{}
+	
 	for _, idx := range idxs {
-		results = append(results, s.CompleteWorks[idx-250:idx+250])
+		start := idx - 250
+		end := idx + 250
+		
+		if start < 0 {
+			start = 0
+		}
+
+		if end > len(s.CompleteWorks) {
+			end = len(s.CompleteWorks)
+		}
+
+		results = append(results, s.CompleteWorks[start:end])
 	}
 	return results
 }

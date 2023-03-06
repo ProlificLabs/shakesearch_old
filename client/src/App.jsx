@@ -18,13 +18,11 @@ function App() {
   const [searchResult, setSearchResult] = useState([]);
 
   useEffect(() => {
-    console.log("searchQuery changed", searchQuery);
     if (searchQuery) {
       fetch(`/search?q=${searchQuery}`)
         .then((response) => response.json())
         .then((data) => {
           setSearchResult(data);
-          console.log(data);
         })
         .catch((error) => console.error(error));
     }
