@@ -1,7 +1,7 @@
 import React from "react";
 
 export const hightText = (text, searchTerm) => {
-  const regex = new RegExp(`(\\b${searchTerm}\\b)`, "gi");
+  const regex = new RegExp(`(${searchTerm})`, "gi");
 
   const parts = text.split(regex);
 

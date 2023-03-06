@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -45,6 +46,11 @@ func handleSearch(searcher Searcher) func(w http.ResponseWriter, r *http.Request
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 
+		queryLengthLimit := 100
+		currentPageNum := 1
+		resultsLimit := 2000
+		resultsPerPageNum := resultsLimit
+
 
 		query, ok := r.URL.Query()["q"]
 		if !ok || len(query[0]) < 1 {
@@ -52,7 +58,33 @@ func handleSearch(searcher Searcher) func(w http.ResponseWriter, r *http.Request
 			w.Write([]byte("missing search query in URL params"))
 			return
 		}
-		results := searcher.Search(query[0])
+
+		if len(query) > queryLengthLimit {
+			query = query[:queryLengthLimit]
+		}	
+
+		if pageNum := r.URL.Query().Get("pageNum"); pageNum != "" {
+			convertedPageNum, err := strconv.Atoi(pageNum)
+
+			if err == nil {
+				currentPageNum = convertedPageNum
+			} else {
+				w.Write([]byte("pageNum type error"))
+				return
+			}
+		} 
+
+		if resultsPerPage := r.URL.Query().Get("resultsPerPage"); resultsPerPage != "" {
+			convertedResultsPerPage, err := strconv.Atoi(resultsPerPage)
+			if err == nil {
+				resultsPerPageNum = convertedResultsPerPage
+			} else {
+				w.Write([]byte("resultsPerPage type error"))
+				return
+			}
+		} 
+
+		results := searcher.Search(query[0], currentPageNum, resultsPerPageNum)
 		buf := &bytes.Buffer{}
 		enc := json.NewEncoder(buf)
 		err := enc.Encode(results)
@@ -78,28 +110,34 @@ func (s *Searcher) Load(filename string) error {
 	return nil
 }
 
-func (s *Searcher) Search(query string) []string {
-	if len(query) > 100 {
-		query = query[:100]
-	}	
+func (s *Searcher) Search(query string, pageNum int, resultsPerPage int) []string {
+	startIdx := (pageNum -1)*resultsPerPage
+	endIdx := startIdx + resultsPerPage
 
 	idxs := s.SuffixArray.Lookup([]byte(strings.ToLower(query)), -1)
 
 	results := []string{}
+
+	for i, idx := range idxs {
+		if i>= startIdx && i < endIdx {
+			textStart := idx - 250
+			textEnd := idx + 250
+			
+			if textStart < 0 {
+				textStart = 0
+			}
+
+			if textEnd > len(s.CompleteWorks) {
+				textEnd = len(s.CompleteWorks)
+			}
+
+			results = append(results, s.CompleteWorks[textStart:textEnd])
+
+			if len(results) == endIdx {
+				break
+			}
+		}
 	
-	for _, idx := range idxs {
-		start := idx - 250
-		end := idx + 250
-		
-		if start < 0 {
-			start = 0
-		}
-
-		if end > len(s.CompleteWorks) {
-			end = len(s.CompleteWorks)
-		}
-
-		results = append(results, s.CompleteWorks[start:end])
 	}
 	return results
 }
