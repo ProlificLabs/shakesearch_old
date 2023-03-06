@@ -4,6 +4,8 @@ import "./App.css";
 import { SearchBox } from "./components/SearchBox.component";
 import { List } from "./components/List.component";
 
+import { getSearchResults } from "./utils/api";
+
 const AppComponent = ({ searchResult, setSearchQuery, searchQuery }) => {
   return (
     <div className="flex justify-center flex-col p-20">
@@ -18,14 +20,12 @@ function App() {
   const [searchResult, setSearchResult] = useState([]);
 
   useEffect(() => {
-    if (searchQuery) {
-      fetch(`/search?q=${searchQuery}`)
-        .then((response) => response.json())
-        .then((data) => {
-          setSearchResult(data);
-        })
-        .catch((error) => console.error(error));
-    }
+    const fetchData = async () => {
+      const searchResponse = await getSearchResults(searchQuery);
+      setSearchResult(searchResponse);
+    };
+
+    fetchData().catch(console.error);
   }, [searchQuery]);
 
   return (

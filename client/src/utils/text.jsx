@@ -13,7 +13,7 @@ export const hightText = (text, searchTerm) => {
     <div>
       {parts.map((part, index) =>
         part.match(regex) ? (
-          <a key={index} className="underline decoration-sky-500 decoration-4">
+          <a key={index} className="text-white bg-blue-600">
             {part}
           </a>
         ) : (

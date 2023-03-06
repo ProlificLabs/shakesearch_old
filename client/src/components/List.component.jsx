@@ -20,7 +20,7 @@ export const List = React.memo(({ searchResult, searchQuery }) => {
     setStartIndex(startIndex);
     setEndIndex(endIndex);
 
-    setPerPageResults(searchResult.slice(startIndex, endIndex));
+    setPerPageResults(searchResult?.slice(startIndex, endIndex));
   }, [currentPage, searchResult, resultsPerPage]);
 
   useEffect(() => {
@@ -29,19 +29,32 @@ export const List = React.memo(({ searchResult, searchQuery }) => {
 
   return (
     <>
-      <div className="mt-5 container m-auto grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
-        {perPageResults.map((item) => (
-          <ListItem key={item} text={item} searchQuery={searchQuery} />
-        ))}
-      </div>
-      <Pagination
-        searchResult={searchResult}
-        currentPage={currentPage}
-        setCurrentPage={setCurrentPage}
-        startIndex={startIndex}
-        endIndex={endIndex}
-        resultsPerPage={resultsPerPage}
-      />
+      {searchResult?.length > 0 ? (
+        <>
+          <div
+            className="mt-5 container m-auto grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5"
+            data-testid="searchResults"
+          >
+            {perPageResults?.map((item) => (
+              <ListItem key={item} text={item} searchQuery={searchQuery} />
+            ))}
+          </div>
+          <Pagination
+            searchResult={searchResult}
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            startIndex={startIndex}
+            endIndex={endIndex}
+            resultsPerPage={resultsPerPage}
+          />
+        </>
+      ) : (
+        searchQuery && (
+          <p className="mb-3 font-light text-gray-500">
+            No results, Please try again
+          </p>
+        )
+      )}
     </>
   );
 });
