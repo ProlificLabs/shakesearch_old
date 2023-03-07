@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "build": "cd client && npm install && ./node_modules/.bin/react-scripts build",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "cd client && ./node_modules/.bin/react-scripts start",
+    "test": "cd client && ./node_modules/.bin/react-scripts test"
   },
   "repository": {
     "type": "git",

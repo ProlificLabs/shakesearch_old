@@ -35,8 +35,13 @@ export const List = React.memo(({ searchResult, searchQuery }) => {
             className="mt-5 container m-auto grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5"
             data-testid="searchResults"
           >
-            {perPageResults?.map((item) => (
-              <ListItem key={item} text={item} searchQuery={searchQuery} />
+            {perPageResults?.map((item, idx) => (
+              <ListItem
+                key={item}
+                text={item}
+                searchQuery={searchQuery}
+                itemTotalIndex={startIndex + idx}
+              />
             ))}
           </div>
           <Pagination

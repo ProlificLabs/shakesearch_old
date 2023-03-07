@@ -4,6 +4,7 @@ import user from "@testing-library/user-event";
 
 import App from "./App";
 import { MOCKED_SEARCH_RESULTS } from "./tests/apiMock";
+import { ListItem } from "./components/List.component";
 
 describe("<App />", () => {
   beforeEach(() => {
@@ -35,7 +36,9 @@ describe("<App />", () => {
     });
 
     const searchResults = screen.queryByTestId("searchResults");
+    const listItems = screen.queryAllByTestId("listItem");
 
     expect(searchResults).toBeTruthy;
+    expect(listItems.length > 0).toBeTruthy;
   });
 });

@@ -25,7 +25,9 @@ function App() {
       setSearchResult(searchResponse);
     };
 
-    fetchData().catch(console.error);
+    if (searchQuery) {
+      fetchData().catch(console.error);
+    }
   }, [searchQuery]);
 
   return (
