@@ -55,8 +55,8 @@ func handleSearch(searcher Searcher) func(w http.ResponseWriter, r *http.Request
 
 		queryLengthLimit := 100
 		currentPageNum := 1
-		resultsLimit := 2000
-		resultsPerPageNum := resultsLimit
+		resultsPerPageNumLimit := 2000
+		resultsPerPageNum := resultsPerPageNumLimit
 
 
 		query, ok := r.URL.Query()["q"]
@@ -84,7 +84,9 @@ func handleSearch(searcher Searcher) func(w http.ResponseWriter, r *http.Request
 		if resultsPerPage := r.URL.Query().Get("resultsPerPage"); resultsPerPage != "" {
 			convertedResultsPerPage, err := strconv.Atoi(resultsPerPage)
 			if err == nil {
-				resultsPerPageNum = convertedResultsPerPage
+				if convertedResultsPerPage < resultsPerPageNumLimit {	
+					resultsPerPageNum = convertedResultsPerPage 
+				}
 			} else {
 				w.Write([]byte("resultsPerPage type error"))
 				return
