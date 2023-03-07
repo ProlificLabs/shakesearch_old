@@ -24,6 +24,8 @@ func main() {
 	http.Handle("/", fs)
 
 	http.HandleFunc("/search", handleSearch(searcher))
+	http.HandleFunc("/health-check", handleHealthCheck)
+
 
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -35,6 +37,11 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func handleHealthCheck(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("OK"))
 }
 
 type Searcher struct {
