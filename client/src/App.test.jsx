@@ -4,7 +4,6 @@ import user from "@testing-library/user-event";
 
 import App from "./App";
 import { MOCKED_SEARCH_RESULTS } from "./tests/apiMock";
-import { ListItem } from "./components/List.component";
 
 describe("<App />", () => {
   beforeEach(() => {
