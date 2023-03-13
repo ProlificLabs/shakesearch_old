@@ -1,8 +1,15 @@
 # Summary
 
-This app allows users to search through the complete works of Shakespeare. It features a simple search function that displays a list of results based on the user's query. The original app can be found at https://github.com/ProlificLabs/shakesearch.
+This app allows users to search through the complete works of Shakespeare. It features a simple search function that displays a list of results based on the user's query. The original repo can be found at https://github.com/ProlificLabs/shakesearch.
 
 This version of the app has been improved from the original app found at https://pulley-shakesearch.onrender.com/. You can try the improved version at https://shakesearch-client.onrender.com.
+
+## Before   
+![Screen Shot 2023-03-07 at 12 23 06 PM](https://user-images.githubusercontent.com/6887905/223500102-19bfcef5-3774-423a-8495-9fda621c6184.png)
+
+
+## After 
+https://user-images.githubusercontent.com/6887905/223499272-0dee8bfa-319b-4133-a462-97ed455ca34d.mov
 
 # Assumptions
 
@@ -17,7 +24,7 @@ The following steps were taken to improve the app:
 - Implemented a search function on the React client with a new UI
 - Improved search with case-insensitivity and search length limit
 - Improved UI and UX with pagination, improved search API with pagination (see future plan)
-- Added tests, error messages, and deployed to render.com
+- Added tests, and error messages, and deployed them to render.com
 
 # Improved features
 
@@ -25,7 +32,7 @@ The following steps were taken to improve the app:
 
 - Added pagination feature to the search API with current page and results per page
 - Fixed a bug where text length was lower than 250
-- Added tests for search feature
+- Added tests for the search feature
 
 ## Client
 
@@ -35,7 +42,7 @@ The following steps were taken to improve the app:
 - Shows the total search results
 - Added highlighted text in every result item
 - Implemented pagination with current page ranges and a better UX experience
-- Added result index for easier identification of the result item (which could be replaced with showing the scene in the future)
+- Added result index for easier identification of the result item (which could be replaced with showing the SCENE in the future)
 - Implemented cached API responses to reduce server costs and speed up the process
 
 # Libraries/Tools used
@@ -61,7 +68,7 @@ Client: `npm run test`
 
 # Decisions and tradeoffs
 
-## Pagination or infinit scroll
+## Pagination or infinite scroll
 
 When listing all items, the two common methods are pagination and infinite scroll. I chose pagination because:
 
@@ -69,29 +76,29 @@ When listing all items, the two common methods are pagination and infinite scrol
 - Pagination makes more sense when searching through the script. In real life, users do not start searching from the first page; they usually search by sections.
 - In the future, we can speed up server processing time by giving clear ranges and reducing memory costs.
 
-## Doing pagination on client side vs server side
+## Doing pagination on the client side vs server side
 
 Initially, I implemented pagination on the server side. However, since the script results are still in a small scope, and every page wouldn't make sense to show too many results (e.g., 1000), it's faster to do it on the client side.
 
 If the scope were to increase in the future, it would make sense to do client and server-side pagination:
 
-For example: If there is a result limitation of 20,000, once the results are higher than 20,000, and a user wants to see more results (by clicking the next button), the server would fetch the next 20,000 results
+For example: If there is a result limitation of 20,000, once the results are higher than 20,000, and a user wants to see more results (by clicking the `next` button), the server would fetch the following 20,000 results
 
-## If it was a bigger project
+# If it was a bigger project
 
-This is a coding challenge and scope is quite small. If it was a bigger real project, doing the following would be better:
+This is a coding challenge and the scope is quite small. If it were a bigger real project, doing the following would be better:
 
-1. Write a script to extract the text and importatn filter (ex: SENEN, PLACE) and save in the database
+1. Write a script to extract the text and important filter (ex: SCENE, PLACE) and save it in the database
 
 - This can extend the search function and results information, ex: show which SENNCE in the title, search `hamlet` in the SENNE I
 
-2. Add cache in server side
+2. Add cache on the server side
 
-- add a middleware wiht libary ex: `go-cache`
+- add a middleware with library ex: `go-cache`
 
-3. UI/UX improvment
+3. UI/UX improvement
 
-- Remember search and results after refreshing the page by adding the search query in the url or localstorage
+- Remember search and results after refreshing the page by adding the search query in the URL or localstorage
 
 4. Increase test coverage for edge cases
 
