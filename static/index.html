@@ -5,17 +5,23 @@
   <meta charset="utf-8">
   <title>ShakeSearch</title>
   <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
   <meta name="theme-color" content="#fafafa">
 </head>
 
 <body>
-    <p>
-        <form id="form">
-            <label for="query">Query</label>
-            <input type="text" id="query" name="query">
-            <button type="submit">Search</button>
-        </form>
-    </p>
+  <div class="container">
+    <div class="header">
+      <h1>ShakeSearch</h1>
+      <p>Search for a text string in the complete works of Shakespeare </p>
+    </div>
+    <form id="form" class="search-form">
+        <label for="query" hidden>Query</label>
+        <input type="text" id="query" name="query">
+        <button type="submit">Search</button>
+    </form>
+  </div>
+
     <p>
         <table id="table">
           <tbody id="table-body"></tbody>
