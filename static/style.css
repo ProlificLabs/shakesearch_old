@@ -293,6 +293,11 @@ textarea {
   text-align: center;
 }
 
+#spinner {
+  margin: auto;
+  display: none;
+}
+
 .header h1 {
   line-height: 0;
   font-size: 3rem;

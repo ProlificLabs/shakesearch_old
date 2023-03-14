@@ -8,15 +8,29 @@ const Controller = {
     const form = document.getElementById("form");
     const data = Object.fromEntries(new FormData(form));
 
-    if (data.query != "") {
-      const response = fetch(`/search?q=${data.query}`).then((response) => {
-        response.json().then((results) => {
-          Controller.updateTable(results);
-        });
-      });
-    } else {
+    if (data.query === "") {
       summary.innerHTML = "No search term was given";
+      return;
     }
+
+    const spinner = document.getElementById("spinner");
+    spinner.style.display = "block";
+
+    fetch(`/search?q=${data.query}`)
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+        throw new Error('Something went wrong');
+      })
+      .then((results) => {
+        Controller.updateTable(results);
+      })
+      .catch((error) => {
+        console.log(error)
+        summary.innerHTML = "Something went wrong"
+      })
+      .finally(() => spinner.style.display = "none");
   },
 
   updateTable: (results) => {
