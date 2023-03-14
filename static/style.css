@@ -301,3 +301,7 @@ textarea {
 .result {
   white-space: pre-wrap
 }
+
+#summary {
+  text-align: end;
+}
