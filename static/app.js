@@ -15,7 +15,7 @@ const Controller = {
         });
       });
     } else {
-      summary.textContent = "No search term was given.";
+      summary.innerHTML = "No search term was given";
     }
   },
 
@@ -23,13 +23,13 @@ const Controller = {
     const summary = document.getElementById("summary");
     switch(results.length) {
       case 0:
-        summary.textContent = "No results were found.";
+        summary.textContent = "No results were found";
         break;
       case 1:
-        summary.textContent = "One result was found.";
+        summary.textContent = "One result was found";
         break;
       default:
-        summary.textContent = `${results.length} results were found.`;
+        summary.textContent = `${results.length} results were found`;
     }
 
     const resultsContainer = document.getElementById("results");
