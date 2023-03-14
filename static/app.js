@@ -32,12 +32,12 @@ const Controller = {
         summary.textContent = `${results.length} results were found.`;
     }
 
-    const table = document.getElementById("table-body");
+    const resultsContainer = document.getElementById("results");
     const rows = [];
     for (let result of results) {
-      rows.push(`<tr><p class="result">${result}</p><tr/>`);
+      rows.push(`<div class="result">${result}</div>`);
     }
-    table.innerHTML = rows.join();
+    resultsContainer.innerHTML = rows.join('<hr class="result-divider">');
   },
 };
 
