@@ -10,6 +10,7 @@
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.3.4",
     "heroicons": "^2.0.16",
+    "nprogress": "^0.2.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
@@ -17,9 +18,23 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "test": "jest --coverage",
     "build": "react-scripts build",
-    "test": "react-scripts test",
     "eject": "react-scripts eject"
+  },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "moduleNameMapper": {
+      "axios": "axios/dist/node/axios.cjs",
+      "nprogress": "nprogress/nprogress.js",
+      "\\.css$": "identity-obj-proxy",
+      "^lodash-es$": "lodash"
+    },
+    "transformIgnorePatterns": [
+      "node_modules/(?!axios)",
+      "node_modules/(?!nprogress)",
+      "node_modules/(?!tailwindcss)"
+    ]
   },
   "eslintConfig": {
     "extends": [
@@ -40,6 +55,11 @@
     ]
   },
   "devDependencies": {
+    "@babel/cli": "^7.21.0",
+    "@babel/core": "^7.21.3",
+    "@babel/plugin-syntax-decorators": "^7.21.0",
+    "@babel/preset-env": "^7.20.2",
+    "babel-jest": "^29.5.0",
     "tailwindcss": "^3.2.7"
   }
 }
