@@ -1,0 +1,61 @@
+.App {
+  text-align: center;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 20px;
+}
+
+form {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 500px;
+}
+
+input[type="text"] {
+  border: none;
+  border-radius: 4px;
+  padding: 10px;
+  margin-right: 10px;
+  flex-grow: 1;
+  font-size: 1rem;
+  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+}
+
+button[type="submit"] {
+  border: none;
+  border-radius: 4px;
+  padding: 10px;
+  background-color: #007bff;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+button[type="submit"]:hover {
+  background-color: #0069d9;
+}
+
+label {
+  margin-left: 10px;
+  font-size: 0.8rem;
+}
+
+input[type="checkbox"] {
+  margin-left: 5px;
+  cursor: pointer;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

@@ -1,0 +1,39 @@
+.search-results {
+  font-size: 1.2rem;
+  margin: 1rem 10vw;
+}
+
+.results-table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+  margin-top: 1rem;
+  font-size: 1.2rem;
+}
+
+.results-table th {
+  font-weight: bold;
+  background-color: #f8f9fa;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  text-align: center;
+  border: 1px solid #dee2e6;
+}
+
+.results-table td {
+  padding: 0.5rem 1rem;
+  border: 1px solid #dee2e6;
+}
+
+.results-table td:first-child {
+  width: 70%;
+}
+
+.results-table td:last-child {
+  text-align: center;
+  justify-items: center;
+}
+
+.fa-sort {
+  margin-left: 0.5rem;
+}
