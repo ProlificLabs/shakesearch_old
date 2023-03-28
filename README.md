@@ -14,10 +14,11 @@ This is my improved version of the original, using GO on the backend and React o
 
 ### If I had more time...
 
-1. add caching
-2. add autocomplete suggestions along with handling typos and mis-spellings - using also the caching system for better results
-3. store the works in a more logical way in order to be able to display results by scene/act/chapter, not only by play/work - using a NoSQL DB
-4. improve the UI to make it more intuitive, easy to use, and prettier.
+1. add tests
+2. add caching
+3. add autocomplete suggestions along with handling typos and mis-spellings - using also the caching system for better results
+4. store the works in a more logical way in order to be able to display results by scene/act/chapter, not only by play/work - using a NoSQL DB
+5. improve the UI to make it more intuitive, easy to use, and prettier.
 
 
 ### front end components - React
