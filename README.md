@@ -30,7 +30,7 @@ The Modal component displays the found matches of the search query, within each 
 
 Either click this link:
 
-*link*
+https://deans-better-shakesearch.onrender.com
 
 or clone the repo. run the go file (main.go) on port 3001, and run the react frontend (i used create-react-app to create the frontend)
 
