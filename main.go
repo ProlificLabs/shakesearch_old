@@ -1,27 +1,22 @@
 package main
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
-	"index/suffixarray"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+	"text/template"
+
+	"github.com/hexops/valast"
+	_ "modernc.org/sqlite"
 )
 
 func main() {
-	searcher := Searcher{}
-	err := searcher.Load("completeworks.txt")
-	if err != nil {
-		log.Fatal(err)
-	}
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
+	http.HandleFunc("/", home)
 
-	fs := http.FileServer(http.Dir("./static"))
-	http.Handle("/", fs)
-
-	http.HandleFunc("/search", handleSearch(searcher))
+	http.HandleFunc("/search", handleSearch())
 
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -29,54 +24,67 @@ func main() {
 	}
 
 	fmt.Printf("Listening on port %s...", port)
-	err = http.ListenAndServe(fmt.Sprintf(":%s", port), nil)
+	err := http.ListenAndServe(fmt.Sprintf(":%s", port), nil)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-type Searcher struct {
-	CompleteWorks string
-	SuffixArray   *suffixarray.Index
+func writeErrResp(w http.ResponseWriter, message string) {
+	errorMessage := map[string]string{"error": message}
+	errorJson, _ := json.Marshal((errorMessage))
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusInternalServerError)
+	w.Write(errorJson)
 }
 
-func handleSearch(searcher Searcher) func(w http.ResponseWriter, r *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-		query, ok := r.URL.Query()["q"]
-		if !ok || len(query[0]) < 1 {
-			w.WriteHeader(http.StatusBadRequest)
-			w.Write([]byte("missing search query in URL params"))
-			return
-		}
-		results := searcher.Search(query[0])
-		buf := &bytes.Buffer{}
-		enc := json.NewEncoder(buf)
-		err := enc.Encode(results)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte("encoding failure"))
-			return
-		}
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(buf.Bytes())
-	}
-}
+func home(w http.ResponseWriter, r *http.Request) {
+	tmpl := template.Must(template.ParseFiles("static/index.html"))
+	works, err := getWorks()
+	chars, err := getChars()
 
-func (s *Searcher) Load(filename string) error {
-	dat, err := ioutil.ReadFile(filename)
 	if err != nil {
-		return fmt.Errorf("Load: %w", err)
+		//do something
 	}
-	s.CompleteWorks = string(dat)
-	s.SuffixArray = suffixarray.New(dat)
-	return nil
+
+	pageData := HomePageData{Works: works, Characters: chars}
+
+	tmpl.Execute(w, pageData)
 }
 
-func (s *Searcher) Search(query string) []string {
-	idxs := s.SuffixArray.Lookup([]byte(query), -1)
-	results := []string{}
-	for _, idx := range idxs {
-		results = append(results, s.CompleteWorks[idx-250:idx+250])
+func handleSearch() func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		decoder := json.NewDecoder(r.Body)
+		var qObject SearchQuery
+
+		err := decoder.Decode((&qObject))
+
+		if err != nil {
+			writeErrResp(w, "query decoding error")
+			return
+		}
+
+		if len(qObject.QueryText) == 0 {
+			res := []SearchResult{}
+			r, _ := json.Marshal((res))
+			w.Header().Set("Content-Type", "application/json")
+			w.Write(r)
+			return
+		}
+
+		results, err := executeFTS(qObject)
+
+		if err != nil {
+			fmt.Println(valast.String(err))
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte("db query err"))
+			return
+		}
+
+		resJson, _ := json.Marshal(results)
+
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(resJson)
 	}
-	return results
 }

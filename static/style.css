@@ -11,6 +11,8 @@
    Base styles: opinionated defaults
    ========================================================================== */
 
+@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.4/font/bootstrap-icons.css");
+
 html {
   color: #222;
   font-size: 1em;
@@ -259,4 +261,14 @@ textarea {
   h3 {
     page-break-after: avoid;
   }
+}
+
+.loading {
+    width: 100%;
+    height: 100vh;
+    position: fixed;
+    background:rgba(0,0,0,0.5)
+        url("https://media.giphy.com/media/8agqybiK5LW8qrG3vJ/giphy.gif") center
+        no-repeat;
+    z-index: 1;
 }
