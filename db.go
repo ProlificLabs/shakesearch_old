@@ -7,6 +7,8 @@ import (
 	sqlx "github.com/jmoiron/sqlx"
 )
 
+//data courtesy of www.opensourceshakespeare.org.
+
 func getDB() (*sql.DB, error) {
 	const file string = "database.sqlite3"
 	return sql.Open("sqlite", file)
