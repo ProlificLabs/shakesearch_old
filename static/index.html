@@ -25,9 +25,11 @@
         <link rel="stylesheet"
             href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css"
             />
-        <meta name="theme-color" content="#fafafa">
         <script
             src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
+        <meta name="theme-color" content="#fafafa">
     </head>
 
     <body>
@@ -43,7 +45,7 @@
             <div class="row">
                 <div class="col">
                     <select class="form-select" id="work-selector"
-                        data-placeholder="Select works to search"
+                        data-placeholder="Filter by play or other work"
                         multiple>
                         {{range .Works}}
                         <option value={{.WorkID}}>{{.Title}}</option>
@@ -52,11 +54,10 @@
                 </div>
                 <div class="col">
                     <select class="form-select" id="char-selector"
-                        data-placeholder="Select characters to
-                        search"
+                        data-placeholder="Filter by character"
                         multiple>
                         {{range .Characters}}
-                        <option value={{.CharID}}>{{.Name}}</option>
+                        <option value={{.CharID}}>{{.Name}} ({{.WorkTitle}})</option>
                         {{end}}
                     </select>
                 </div>
@@ -89,8 +90,10 @@
                 <table id="table" class="table table-bordered">
                     <thead>
                         <tr>
-                            <th scope="col">Work</th>
-                            <th scope="col">Character</th>
+                            <th scope="col" class="search-th"
+                                data-val="work">Work</th>
+                            <th scope="col" class="search-th"
+                                data-val="char">Character</th>
                             <th scope="col">Text</th>
                         </tr>
                     </thead>

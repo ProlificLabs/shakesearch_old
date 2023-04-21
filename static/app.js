@@ -25,28 +25,38 @@ const Controller = {
     table.innerHTML = rows.join('');
 
     $("#res-count").text(`${results.length} results`);
-    console.log($("#res-count"))
   },
 };
 
+let RESULTS = [];
+// const SORT = { fields: [], orders: [] };
+
 function executeSearch(queryObject) {
   Controller.setLoading();
+  const table = document.getElementById("table-body");
+  table.innerHTML = "";
 
   fetch(`/search`, { method: "POST", body: JSON.stringify(queryObject) })
     .then((response) => {
       response.json().then((res) => {
         Controller.unsetLoading();
         if (res === null || res.length === 0) {
-          // console.log("Search returned 0 results");
           $("#res-count").text(`0 results`);
           return;
         }
+
+        RESULTS = res;
 
         addSearchToHistory(queryObject);
         Controller.updateTable(res);
       });
       // .catch(err => console.log(err));
     });
+}
+
+function sortResults(sortParams) {
+  let sorted = _.orderBy(RESULTS, sortParams.field, sortParams.order);
+  Controller.updateTable(sorted);
 }
 
 $("#search").click((e) => {
@@ -68,12 +78,18 @@ $("#search").click((e) => {
 $("#history-button").click((e) => {
   $("#put-search-history").empty();
 
-  const searches = getSearchHistory().reverse();
+  // const searches = getSearchHistory().reverse();
+  const searches = getSearchHistory();
+  const searchAnchors = [];
 
   for (let i = 0; i < searches.length; i++) {
     let searchQuery = searches[i];
     const searchAnchor = `<li><a class="search-history-entry" href="#" data-val=${i}>Search for "${searchQuery.query}", plus ${searchQuery.workIds.length} work filters and ${searchQuery.charIds.length} character filters. </a></li>`;
-    $("#put-search-history").append(searchAnchor);
+    searchAnchors.push(searchAnchor);
+  }
+
+  for (let s of searchAnchors.reverse()) {
+    $("#put-search-history").append(s);
   }
 
   $(".search-history-entry").click(redoSearch);
@@ -92,6 +108,31 @@ $('.form-select').select2({
   width: $(this).data('width') ? $(this).data('width') : $(this).hasClass('w-100') ? '100%' : 'style',
   placeholder: $(this).data('placeholder'),
   closeOnSelect: false,
+});
+
+$(".search-th").hover(function () {
+  $(this).addClass("table-secondary");
+});
+
+$(".search-th").mouseout(function () {
+  $(this).removeClass("table-secondary");
+});
+
+$(".search-th").click(function () {
+  const currentlySortedDesc = $(this).hasClass("table-primary");
+  $(".search-th").removeClass("table-primary"); //rm existing because we are only permitting sort by one field at a time
+
+  $(this).removeClass("table-secondary");
+
+  if (!currentlySortedDesc) {
+    $(this).addClass("table-primary");
+  }
+
+  const sortAttr = $(this).data("val");
+  const sortOrder = $(this).hasClass("table-primary") ? "desc" : "asc";
+
+  const sortArgs = { field: sortAttr, order: sortOrder };
+  sortResults(sortArgs);
 });
 
 function getSelectedWorkIds() {

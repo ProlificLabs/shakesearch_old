@@ -18,8 +18,9 @@ type Work struct {
 }
 
 type Character struct {
-	CharID string `json:"charId"`
-	Name   string `json:"name"`
+	CharID    string `json:"charId"`
+	Name      string `json:"name"`
+	WorkTitle string `json:"workTitle"`
 }
 
 type HomePageData struct {

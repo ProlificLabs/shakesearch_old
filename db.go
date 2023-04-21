@@ -7,6 +7,8 @@ import (
 	sqlx "github.com/jmoiron/sqlx"
 )
 
+//data courtesy of www.opensourceshakespeare.org.
+
 func getDB() (*sql.DB, error) {
 	const file string = "database.sqlite3"
 	return sql.Open("sqlite", file)
@@ -54,7 +56,7 @@ func getChars() ([]Character, error) {
 		return []Character{}, e
 	}
 
-	rows, err := db.Query("select CharID, CharName from Characters")
+	rows, err := db.Query("select c.CharID, c.CharName, w.Title from Characters c join Works w on c.Works = w.WorkID")
 
 	if err != nil {
 		return []Character{}, e
@@ -67,14 +69,15 @@ func getChars() ([]Character, error) {
 	for rows.Next() {
 		var charId string
 		var charName string
+		var workTitle string
 
-		err := rows.Scan(&charId, &charName)
+		err := rows.Scan(&charId, &charName, &workTitle)
 
 		if err != nil {
 			return results, err
 		}
 
-		c := Character{Name: charName, CharID: charId}
+		c := Character{Name: charName, CharID: charId, WorkTitle: workTitle}
 
 		results = append(results, c)
 	}
@@ -98,6 +101,8 @@ func prepareQueryAndArgs(query SearchQuery) (string, []interface{}, error) {
 			rawQuery = rawQuery + "and c.CharID in (?)"
 			args = append(args, query.CharIds)
 		}
+
+		rawQuery = rawQuery + " ORDER BY w.Title asc, c.CharName asc"
 
 		sqlQuery, args, err := sqlx.In(rawQuery, args...)
 		if err != nil {
