@@ -29,7 +29,6 @@ const Controller = {
 };
 
 let RESULTS = [];
-// const SORT = { fields: [], orders: [] };
 
 function executeSearch(queryObject) {
   Controller.setLoading();
@@ -71,6 +70,12 @@ function validateArgs(args) {
   return true;
 }
 
+function formatQueryText(t) {
+  if (t.includes("'")) {
+    return "\"" + t + "\"";
+  }
+}
+
 $("#search").click((e) => {
   e.preventDefault();
 
@@ -79,10 +84,12 @@ $("#search").click((e) => {
   const searchTerms = document.getElementById("query").value;
 
   const queryArgs = {
-    query: searchTerms,
+    query: formatQueryText(searchTerms),
     workIds: workSelections,
     charIds: charSelections
   };
+
+  console.log(queryArgs.query);
 
   if (validateArgs(queryArgs)) {
     executeSearch(queryArgs);
@@ -96,7 +103,6 @@ $(".search-opts").keydown((e) => {
 $("#history-button").click((e) => {
   $("#put-search-history").empty();
 
-  // const searches = getSearchHistory().reverse();
   const searches = getSearchHistory();
   const searchAnchors = [];
 
@@ -106,7 +112,7 @@ $("#history-button").click((e) => {
     searchAnchors.push(searchAnchor);
   }
 
-  for (let s of searchAnchors.reverse()) {
+  for (let s of searchAnchors.reverse()) { //reverse to show more recent searches first
     $("#put-search-history").append(s);
   }
 
