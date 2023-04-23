@@ -31,6 +31,10 @@ const Controller = {
 let RESULTS = [];
 
 function executeSearch(queryObject) {
+  if (ANALYTICS_CHART) {
+    ANALYTICS_CHART.destroy();
+  }
+
   Controller.setLoading();
   const table = document.getElementById("table-body");
   table.innerHTML = "";
