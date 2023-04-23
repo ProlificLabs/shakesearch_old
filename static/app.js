@@ -95,8 +95,6 @@ $("#search").click((e) => {
     charIds: charSelections
   };
 
-  console.log(queryArgs.query);
-
   if (validateArgs(queryArgs)) {
     executeSearch(queryArgs);
   }

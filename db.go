@@ -192,8 +192,6 @@ func executeFTS(query SearchQuery) ([]SearchResult, error) {
 		}
 
 		r := SearchResult{Text: strings.ReplaceAll(text, "[p]", ""), Work: title, Character: charName}
-		// print(r)
-		// fmt.Println(valast.String(r))
 		results = append(results, r)
 	}
 
