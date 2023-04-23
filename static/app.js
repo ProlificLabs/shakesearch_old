@@ -74,6 +74,8 @@ function formatQueryText(t) {
   if (t.includes("'")) {
     return "\"" + t + "\"";
   }
+
+  return t;
 }
 
 $("#search").click((e) => {
