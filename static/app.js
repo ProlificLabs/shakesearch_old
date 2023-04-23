@@ -49,6 +49,7 @@ function executeSearch(queryObject) {
 
         addSearchToHistory(queryObject);
         Controller.updateTable(res);
+        displayAnalytics();
       });
       // .catch(err => console.log(err));
     });
@@ -57,6 +58,17 @@ function executeSearch(queryObject) {
 function sortResults(sortParams) {
   let sorted = _.orderBy(RESULTS, sortParams.field, sortParams.order);
   Controller.updateTable(sorted);
+}
+
+function validateArgs(args) {
+  // the only type of query not permitted is one that neither searches for any specific text, nor filters by either of work or char
+  if (!args.query || args.query.length === 0) {
+    if (args.charIds.length === 0 && args.workIds.length === 0) {
+      $("#query").addClass('is-invalid');
+      return false;
+    }
+  }
+  return true;
 }
 
 $("#search").click((e) => {
@@ -72,7 +84,13 @@ $("#search").click((e) => {
     charIds: charSelections
   };
 
-  executeSearch(queryArgs);
+  if (validateArgs(queryArgs)) {
+    executeSearch(queryArgs);
+  }
+});
+
+$(".search-opts").keydown((e) => {
+  $("#query").removeClass('is-invalid');
 });
 
 $("#history-button").click((e) => {
@@ -160,4 +178,45 @@ function addSearchToHistory(qArgs) {
   }
 
   Cookies.set(COOKIE_KEY, JSON.stringify(currentHistory));
+}
+
+$("#analytics-btn").click(displayAnalytics);
+
+let ANALYTICS_CHART;
+
+function displayAnalytics() {
+  if (ANALYTICS_CHART) {
+    ANALYTICS_CHART.destroy();
+  }
+
+  const charChartCanvas = document.getElementById('char-chart');
+
+  const characters = new Set(_.map(RESULTS, "char"));
+  const resByChar = [];
+
+  for (let c of characters) {
+    let charResults = _.filter(RESULTS, r => r.char === c);
+    resByChar.push((charResults.length / RESULTS.length) * 100);
+  }
+
+  ANALYTICS_CHART = new Chart(charChartCanvas, {
+    type: 'pie',
+    data: {
+      labels: Array.from(characters),
+      datasets: [{
+        label: '% by character',
+        data: resByChar,
+        hoverOffset: 4,
+        borderWidth: 0
+        // borderWidth: 1
+      }]
+    },
+    options: {
+      maintainAspectRatio: false,
+      responsive: true,
+      tooltips: {
+        enabled: true
+      }
+    },
+  });
 }

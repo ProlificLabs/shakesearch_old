@@ -29,6 +29,7 @@
             src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
         <script
             src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <meta name="theme-color" content="#fafafa">
     </head>
 
@@ -37,23 +38,28 @@
             <div class="row">
                 <div class="col-4 align-self-center">
                     <label for="exampleFormControlInput1" class="form-label">Query</label>
-                    <input type="text" class="form-control" id="query"
+                    <input type="text" class="form-control search-opts"
+                        id="query"
                         placeholder="Enter your search terms here">
+                    <div class="invalid-feedback">Please enter some
+                        search text or select one of the filters.</div>
                 </div>
             </div>
             <br />
             <div class="row">
                 <div class="col">
                     <select class="form-select" id="work-selector"
+                        working
                         data-placeholder="Filter by play or other work"
                         multiple>
                         {{range .Works}}
                         <option value={{.WorkID}}>{{.Title}}</option>
                         {{end}}
                     </select>
+
                 </div>
                 <div class="col">
-                    <select class="form-select" id="char-selector"
+                    <select class="form-select search-opts" id="char-selector"
                         data-placeholder="Filter by character"
                         multiple>
                         {{range .Characters}}
@@ -63,14 +69,24 @@
                 </div>
             </div>
             <br />
-            <div class="col" id="form">
-                <button type="submit" class="btn btn-primary" id="search">Search</button>
-                <button class="btn btn-secondary" type="button"
-                    id="history-button"
-                    data-bs-toggle="collapse" data-bs-target="#collapseExample"
-                    aria-expanded="false" aria-controls="collapseExample">
-                    Search History
-                </button>
+            <div class="row">
+                <div class="col" id="form">
+                    <button type="submit" class="btn btn-primary" id="search">Search</button>
+                    <button class="btn btn-secondary" type="button"
+                        id="history-button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#collapseExample"
+                        aria-expanded="false" aria-controls="collapseExample">
+                        Search History
+                    </button>
+                </div>
+                <div class="col align-self-end">
+                    <button type="button" class="btn btn-info"
+                        id="analytics-btn"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#chartRow"
+                        aria-expanded="false" aria-controls="chartRow">Analytics</button>
+                </div>
             </div>
             <br />
             <div class="container">
@@ -80,6 +96,13 @@
                         <ul id="put-search-history">
 
                         </ul>
+                    </div>
+                </div>
+
+
+                <div class="collapse row" id="chartRow">
+                    <div class="card card-body col" style="height: 500px">
+                        <canvas id="char-chart"></canvas>
                     </div>
                 </div>
 

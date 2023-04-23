@@ -85,7 +85,36 @@ func getChars() ([]Character, error) {
 	return results, nil
 }
 
+func getFilterQuery(query SearchQuery) (string, []interface{}, error) {
+	//this is for when a user inserts no text, but does select a Work or Character filter. The sql query here is sufficiently different so as to merit a separate function.
+
+	var args []any
+
+	baseQuery := "select w.Title, p.PlainText, c.CharName from Paragraphs p join Works w on w.WorkID = p.WorkID join Characters c on c.CharID = p.CharID where "
+
+	if len(query.CharIds) > 0 {
+		baseQuery = baseQuery + "c.CharID in (?) "
+		args = append(args, query.CharIds)
+	}
+
+	if len(query.CharIds) > 0 && len(query.WorkIds) > 0 {
+		baseQuery = baseQuery + "and "
+	}
+
+	if len(query.WorkIds) > 0 {
+		baseQuery = baseQuery + "p.WorkID in (?)"
+		args = append(args, query.WorkIds)
+	}
+
+	fmtQuery, fmtArgs, err := sqlx.In(baseQuery, args...)
+	return fmtQuery, fmtArgs, err
+}
+
 func prepareQueryAndArgs(query SearchQuery) (string, []interface{}, error) {
+	if len(query.QueryText) == 0 {
+		return getFilterQuery(query)
+	}
+
 	rawQuery := "select w.Title,highlight(par_fts, 0, '<mark>', '</mark>') as text, c.CharName from par_fts s join Paragraphs p on s.rowid = p.ParagraphID join Works w on w.WorkID = p.WorkID join Characters c on c.CharID = p.CharID where s.text MATCH ? "
 
 	var args []any
@@ -135,6 +164,11 @@ func executeFTS(query SearchQuery) ([]SearchResult, error) {
 
 	if len(query.WorkIds) > 0 || len(query.CharIds) > 0 {
 		rows, err = db.Query(sqlQuery, args...)
+
+		if len(query.QueryText) == 0 {
+
+		}
+
 	} else {
 		rows, err = db.Query(sqlQuery, query.QueryText)
 	}

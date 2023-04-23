@@ -65,7 +65,7 @@ func handleSearch() func(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		if len(qObject.QueryText) == 0 {
+		if len(qObject.QueryText) == 0 && len(qObject.CharIds) == 0 && len(qObject.WorkIds) == 0 {
 			res := []SearchResult{}
 			r, _ := json.Marshal((res))
 			w.Header().Set("Content-Type", "application/json")
