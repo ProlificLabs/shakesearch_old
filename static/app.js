@@ -130,6 +130,7 @@ function redoSearch(e) {
   const previousSearch = previousSearches[searchHistoryIndex];
   $('#work-selector').val(previousSearch.workIds).trigger("change");
   $('#char-selector').val(previousSearch.charIds).trigger("change");
+  $("#query").val(previousSearch.query);
   executeSearch(previousSearch);
 }
 
