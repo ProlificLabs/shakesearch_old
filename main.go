@@ -57,6 +57,8 @@ func handleSearch(searcher Searcher) func(w http.ResponseWriter, r *http.Request
 			page, _ = strconv.Atoi(pageParam[0])
 		}
 
+		log.Println("got search request for", query, page)
+
 		results := searcher.Search(query[0], page)
 		buf := &bytes.Buffer{}
 		enc := json.NewEncoder(buf)
