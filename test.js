@@ -20,13 +20,15 @@ describe('ShakeSearch', () => {
 
   it('should return no results for "Luke, I am your father"', async () => {
     const query = 'Luke, I am your father';
+    await page.evaluate(() => document.getElementById('query').value = ''); // Reset the input field
     await page.type('#query', query);
     await page.click('button[type="submit"]');
     await page.waitForTimeout(1000);
   
     const results = await page.evaluate(() => {
       const rows = document.querySelectorAll('#table-body tr');
-      return Array.from(rows, row => row.innerText);
+        return Array.from(rows, row => row.textContent.trim());
+
     });
   
     assert.isEmpty(results, 'Search results should be empty');
@@ -34,13 +36,15 @@ describe('ShakeSearch', () => {
 
   it('should return search results for "romeo, wherefore art thou"', async () => {
     const query = 'romeo, wherefore art thou';
+    await page.evaluate(() => document.getElementById('query').value = ''); // Reset the input field
     await page.type('#query', query);
     await page.click('button[type="submit"]');
     await page.waitForSelector('#table-body tr');
 
     const results = await page.evaluate(() => {
       const rows = document.querySelectorAll('#table-body tr');
-      return Array.from(rows, row => row.innerText);
+        return Array.from(rows, row => row.textContent.trim());
+
     });
 
     assert.isNotEmpty(results, 'Search results should not be empty');
@@ -49,21 +53,24 @@ describe('ShakeSearch', () => {
 
   it('should load more results for "horse" when clicking "Load More"', async () => {
     const query = 'horse';
+    await page.evaluate(() => document.getElementById('query').value = ''); // Reset the input field
     await page.type('#query', query);
     await page.click('button[type="submit"]');
     await page.waitForSelector('#table-body tr');
 
     const initialResults = await page.evaluate(() => {
       const rows = document.querySelectorAll('#table-body tr');
-      return Array.from(rows, row => row.innerText);
+        return Array.from(rows, row => row.textContent.trim());
+
     });
 
-    await page.click('button:contains("Load More")');
+    await page.click('#load-more');
     await page.waitForTimeout(1000);
 
     const updatedResults = await page.evaluate(() => {
       const rows = document.querySelectorAll('#table-body tr');
-      return Array.from(rows, row => row.innerText);
+        return Array.from(rows, row => row.textContent.trim());
+
     });
 
     assert.isAbove(updatedResults.length, initialResults.length, 'More results should be added to the results table');
