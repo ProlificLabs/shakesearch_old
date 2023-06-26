@@ -1,43 +1,32 @@
-# ShakeSearch
+# ShakeSearch Challenge
 
-Welcome to the Pulley Shakesearch Take-home Challenge! In this repository, you'll find a simple web app that allows a user to search for a text string in the complete works of Shakespeare.
+Welcome to the Pulley Shakesearch Challenge! This repository contains a simple web app for searching text in the complete works of Shakespeare.
 
-You can see a live version of the app at https://pulley-shakesearch.onrender.com/. Try searching for "Hamlet" to display a set of results.
+## Prerequisites
 
-In its current state, however, the app has some limitations. The search is case sensitive, and the search is limited to exact matches.
+To run the tests, you need to have Go and Docker installed on your system.
 
-## Your Mission
+## Your Task
 
-Your challenge is to fix the failing tests in the app. There are 3 frontend tests and 3 backend tests, with 2 of each currently failing. You can use the provided Dockerfile to run the tests or to run the app locally. The success criteria for this challenge is to have all 6 tests passing.
+Your task is to fix the underlying code to make the failing tests in the app pass. There are 3 frontend tests and 3 backend tests, with 2 of each currently failing. You should not modify the tests themselves, but rather improve the code to meet the test requirements. You can use the provided Dockerfile to run the tests or the app locally. The success criteria are to have all 6 tests passing.
 
-You can approach this with a back-end, front-end, or full-stack focus. We're open to candidates who aren't full-stack but are able to work through both frontend and backend issues to fix the tests.
+## Instructions
+
+1. Fork this repository.
+2. Fix the underlying code to make the tests pass.
+3. Open a pull request, which will run the tests through GitHub Actions. Ensure all tests pass.
+4. Email us back with a short explanation of the process of making the tests pass by improving the code.
 
 ## Running the App Locally
 
-To run the app locally, use the following command:
-
-```
+```bash
 make run
 ```
 
-This will build the Go binary and run it, starting the server on the default port (3001).
-
 ## Running the Tests
 
-To run the tests, use the following command:
-
-```
+```bash
 make test
 ```
 
-This will run both the Go tests and the frontend tests using the Docker container.
-
-## Evaluation
-
-We will be primarily evaluating based on how well the tests are fixed and the overall quality of the code. A strong submission will have all 6 tests passing and demonstrate a good understanding of the problem and the technologies involved.
-
-## Submission
-
-1. Fork this repository and send us a link to your fork after pushing your changes.
-2. Ensure that the application deploys cleanly from a public URL using Render (render.com) hosting.
-3. In your submission, share with us what changes you made, how you fixed the tests, and any additional improvements you would prioritize if you had more time.
+Good luck!
