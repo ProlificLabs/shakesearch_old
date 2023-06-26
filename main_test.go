@@ -19,21 +19,25 @@ func TestSearch(t *testing.T) {
 		name           string
 		query          string
 		expectedResult bool
+		expectedText   string
 	}{
 		{
 			name:           "Passing Test",
 			query:          "Hamlet",
 			expectedResult: true,
+			expectedText:   "",
 		},
 		{
 			name:           "Failing Test - Case Sensitive",
-			query:          "juliet",
+			query:          "hAmLeT",
 			expectedResult: true,
+			expectedText:   "",
 		},
 		{
 			name:           "Failing Test - Punctuation",
 			query:          "to be or not to be",
 			expectedResult: true,
+			expectedText:   "To be, or not to be",
 		},
 	}
 
@@ -60,14 +64,21 @@ func TestSearch(t *testing.T) {
 
 			found := false
 			for _, result := range results {
-				if strings.Contains(strings.ToLower(result), strings.ToLower(test.query)) {
-					found = true
-					break
+				if test.expectedText == "" {
+					if strings.Contains(strings.ToLower(result), strings.ToLower(test.query)) {
+						found = true
+						break
+					}
+				} else {
+					if strings.Contains(result, test.expectedText) {
+						found = true
+						break
+					}
 				}
 			}
 
 			if found != test.expectedResult {
-				t.Errorf("expected result for `%s`: got %v want %v", test.query, found, test.expectedResult)
+				t.Errorf("expected result not found: got %v want %v", found, test.expectedResult)
 			}
 		})
 	}
