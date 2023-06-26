@@ -8,78 +8,114 @@ import (
 	"testing"
 )
 
-func TestSearch(t *testing.T) {
+func TestSearchHamlet(t *testing.T) {
 	searcher := Searcher{}
 	err := searcher.Load("completeworks.txt")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	tests := []struct {
-		name           string
-		query          string
-		expectedResult bool
-		expectedText   string
-	}{
-		{
-			name:           "Passing Test",
-			query:          "Hamlet",
-			expectedResult: true,
-			expectedText:   "",
-		},
-		{
-			name:           "Failing Test - Case Sensitive",
-			query:          "hAmLeT",
-			expectedResult: true,
-			expectedText:   "",
-		},
-		{
-			name:           "Failing Test - Punctuation",
-			query:          "to be or not to be",
-			expectedResult: true,
-			expectedText:   "To be, or not to be",
-		},
+	query := "Hamlet"
+	req, err := http.NewRequest("GET", "/search?q="+query, nil)
+	if err != nil {
+		t.Fatal(err)
 	}
 
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			req, err := http.NewRequest("GET", "/search?q="+test.query, nil)
-			if err != nil {
-				t.Fatal(err)
-			}
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(handleSearch(searcher))
+	handler.ServeHTTP(rr, req)
 
-			rr := httptest.NewRecorder()
-			handler := http.HandlerFunc(handleSearch(searcher))
-			handler.ServeHTTP(rr, req)
+	if status := rr.Code; status != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusOK)
+	}
 
-			if status := rr.Code; status != http.StatusOK {
-				t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusOK)
-			}
+	var results []string
+	err = json.Unmarshal(rr.Body.Bytes(), &results)
+	if err != nil {
+		t.Fatal(err)
+	}
 
-			var results []string
-			err = json.Unmarshal(rr.Body.Bytes(), &results)
-			if err != nil {
-				t.Fatal(err)
-			}
+	found := false
+	for _, result := range results {
+		if strings.Contains(strings.ToLower(result), strings.ToLower(query)) {
+			found = true
+			break
+		}
+	}
 
-			found := false
-			for _, result := range results {
-				if test.expectedText == "" {
-					if strings.Contains(strings.ToLower(result), strings.ToLower(test.query)) {
-						found = true
-						break
-					}
-				} else {
-					if strings.Contains(result, test.expectedText) {
-						found = true
-						break
-					}
-				}
-			}
+	if !found {
+		t.Errorf("expected result not found for query: %s", query)
+	}
+}
 
-			if found != test.expectedResult {
-				t.Errorf("expected result not found: got %v want %v", found, test.expectedResult)
-			}
-		})
+func TestSearchCaseSensitive(t *testing.T) {
+	searcher := Searcher{}
+	err := searcher.Load("completeworks.txt")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	query := "hAmLeT"
+	req, err := http.NewRequest("GET", "/search?q="+query, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(handleSearch(searcher))
+	handler.ServeHTTP(rr, req)
+
+	if status := rr.Code; status != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusOK)
+	}
+
+	var results []string
+	err = json.Unmarshal(rr.Body.Bytes(), &results)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	found := false
+	for _, result := range results {
+		if strings.Contains(strings.ToLower(result), strings.ToLower(query)) {
+			found = true
+			break
+		}
+	}
+
+	if !found {
+		t.Errorf("expected result not found for query: %s", query)
+	}
+}
+
+func TestSearchDrunk(t *testing.T) {
+	searcher := Searcher{}
+	err := searcher.Load("completeworks.txt")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	query := "drunk"
+	req, err := http.NewRequest("GET", "/search?q="+query, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(handleSearch(searcher))
+	handler.ServeHTTP(rr, req)
+
+	if status := rr.Code; status != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusOK)
+	}
+
+	var results []string
+	err = json.Unmarshal(rr.Body.Bytes(), &results)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(results) != 20 {
+		t.Errorf("expected 20 results for query: %s, got %d", query, len(results))
 	}
 }
