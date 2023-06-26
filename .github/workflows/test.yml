@@ -1,1 +1,48 @@
+name: Run Tests
 
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  backend-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v2
+
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.16
+
+    - name: Install dependencies
+      run: go mod download
+
+    - name: Run Go tests
+      run: go test -v
+
+  frontend-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: 14
+
+    - name: Install frontend dependencies
+      run: |
+        npm ci
+
+    - name: Build and run Docker container
+      run: |
+        make frontend-test

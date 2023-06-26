@@ -1,30 +1,32 @@
-# ShakeSearch
+# ShakeSearch Challenge
 
-Welcome to the Pulley Shakesearch Take-home Challenge! In this repository,
-you'll find a simple web app that allows a user to search for a text string in
-the complete works of Shakespeare.
+Welcome to the Pulley Shakesearch Challenge! This repository contains a simple web app for searching text in the complete works of Shakespeare.
 
-You can see a live version of the app at
-https://pulley-shakesearch.onrender.com/. Try searching for "Hamlet" to display
-a set of results.
+## Prerequisites
 
-In it's current state, however, the app is in rough shape. The search is
-case sensitive, the results are difficult to read, and the search is limited to
-exact matches.
+To run the tests, you need to have Go and Docker installed on your system.
 
-## Your Mission
+## Your Task
 
-Improve the app! Think about the problem from the **user's perspective**
-and prioritize your changes according to what you think is most useful.
+Your task is to fix the underlying code to make the failing tests in the app pass. There are 3 frontend tests and 3 backend tests, with 2 of each currently failing. You should not modify the tests themselves, but rather improve the code to meet the test requirements. You can use the provided Dockerfile to run the tests or the app locally. The success criteria are to have all 6 tests passing.
 
-You can approach this with a back-end, front-end, or full-stack focus.
+## Instructions
 
-## Evaluation
+1. Fork this repository.
+2. Fix the underlying code to make the tests pass.
+3. Open a pull request, which will run the tests through GitHub Actions. Ensure all tests pass.
+4. Email us back with a short explanation of the process of making the tests pass by improving the code.
 
-We will be primarily evaluating based on how well the search works for users. A search result with a lot of features (i.e. multi-words and mis-spellings handled), but with results that are hard to read would not be a strong submission.
+## Running the App Locally
 
-## Submission
+```bash
+make run
+```
 
-1. Fork this repository and send us a link to your fork after pushing your changes.
-2. Render (render.com) hosting, the application deploys cleanly from a public url.
-3. In your submission, share with us what changes you made and how you would prioritize changes if you had more time.
+## Running the Tests
+
+```bash
+make test
+```
+
+Good luck!

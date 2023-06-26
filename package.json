@@ -1,0 +1,16 @@
+{
+  "name": "shakesearch",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha test.js"
+  },
+  "dependencies": {
+    "chai": "^4.3.4",
+    "puppeteer-core": "^10.4.0"
+  },
+  "devDependencies": {
+    "mocha": "^9.1.3"
+  }
+}
