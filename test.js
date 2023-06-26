@@ -32,8 +32,8 @@ describe('ShakeSearch', () => {
     assert.isEmpty(results, 'Search results should be empty');
   });
 
-  it('should return search results for "wherefore art thou romeo"', async () => {
-    const query = 'wherefore art thou romeo';
+  it('should return search results for "romeo, wherefore art thou"', async () => {
+    const query = 'romeo, wherefore art thou';
     await page.type('#query', query);
     await page.click('button[type="submit"]');
     await page.waitForSelector('#table-body tr');
