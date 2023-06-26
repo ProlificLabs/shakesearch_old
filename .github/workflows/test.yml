@@ -9,7 +9,7 @@ on:
       - master
 
 jobs:
-  test:
+  backend-test:
     runs-on: ubuntu-latest
 
     steps:
@@ -26,6 +26,13 @@ jobs:
 
     - name: Run Go tests
       run: go test -v
+
+  frontend-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v2
 
     - name: Set up Node.js
       uses: actions/setup-node@v2
