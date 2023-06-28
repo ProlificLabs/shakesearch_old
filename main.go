@@ -9,6 +9,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
+	"strings"
 )
 
 func main() {
@@ -48,10 +50,38 @@ func handleSearch(searcher Searcher) func(w http.ResponseWriter, r *http.Request
 			w.Write([]byte("missing search query in URL params"))
 			return
 		}
+		page, ok := r.URL.Query()["p"]
+		if !ok || len(page[0]) < 1 {
+			page = []string{"1"}
+		}
+
+		pageNum, err := strconv.ParseInt(page[0], 10, 64)
+		if err != nil || pageNum < 1 {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte("invalid page number"))
+			return
+		}
+		pageIdx := pageNum - 1
+		pageSize := 20
 		results := searcher.Search(query[0])
+
+		start := int(pageIdx) * pageSize
+		end := (int(pageIdx) + 1) * pageSize
+
+		// Check the bounds before slicing
+		if start > len(results) {
+			start = len(results)
+		}
+		if end > len(results) {
+			end = len(results)
+		}
+
+		// Slice the results
+		results = results[start:end]
+
 		buf := &bytes.Buffer{}
 		enc := json.NewEncoder(buf)
-		err := enc.Encode(results)
+		err = enc.Encode(results)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte("encoding failure"))
@@ -68,11 +98,12 @@ func (s *Searcher) Load(filename string) error {
 		return fmt.Errorf("Load: %w", err)
 	}
 	s.CompleteWorks = string(dat)
-	s.SuffixArray = suffixarray.New(dat)
+	s.SuffixArray = suffixarray.New([]byte(strings.ToLower(s.CompleteWorks)))
 	return nil
 }
 
 func (s *Searcher) Search(query string) []string {
+	query = strings.ToLower(query)
 	idxs := s.SuffixArray.Lookup([]byte(query), -1)
 	results := []string{}
 	for _, idx := range idxs {
