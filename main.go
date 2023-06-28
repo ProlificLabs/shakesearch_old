@@ -30,7 +30,7 @@ func main() {
 		port = "3001"
 	}
 
-	fmt.Printf("Listening on port %s...", port)
+	fmt.Printf("shakesearch available at http://localhost:%s...", port)
 	err = http.ListenAndServe(fmt.Sprintf(":%s", port), nil)
 	if err != nil {
 		log.Fatal(err)

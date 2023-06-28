@@ -4,7 +4,7 @@ Welcome to the Pulley Shakesearch Challenge! This repository contains a simple w
 
 ## Prerequisites
 
-To run the tests, you need to have Go and Docker installed on your system.
+To run the tests, you need to have [Go](https://go.dev/doc/install) and [Docker](https://docs.docker.com/engine/install/) installed on your system.
 
 ## Your Task
 
@@ -15,15 +15,25 @@ Your task is to fix the underlying code to make the failing tests in the app pas
 1. Fork this repository.
 2. Fix the underlying code to make the tests pass.
 3. Open a pull request, which will run the tests through GitHub Actions. Ensure all tests pass.
-4. Email us back with a short explanation of the process of making the tests pass by improving the code.
+4. Include a short explanation of your changes in the pull request.
+5. Email us back with a link to the pull request.
 
 ## Running the App Locally
+
+
+This command runs the app on your machine and will be available in browser at localhost:3001.
 
 ```bash
 make run
 ```
 
 ## Running the Tests
+
+This command runs backend and frontend tests.
+
+Backend testing directly runs all Go tests.
+
+Frontend testing run the app and mochajs tests inside docker, using internal port 3002.
 
 ```bash
 make test

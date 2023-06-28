@@ -11,4 +11,4 @@ go-test:
 
 frontend-test:
 	docker build -t shakesearch-test -f Dockerfile.test .
-	docker run --rm -p 3001:3001 shakesearch-test
+	docker run --rm shakesearch-test
