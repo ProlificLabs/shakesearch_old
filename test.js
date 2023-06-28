@@ -11,7 +11,7 @@ describe('ShakeSearch', () => {
       args: ['--no-sandbox'],
     });
     page = await browser.newPage();
-    await page.goto('http://localhost:3001');
+    await page.goto('http://localhost:3002');
   });
 
   after(async () => {

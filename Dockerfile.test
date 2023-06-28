@@ -27,6 +27,6 @@ COPY --from=go-build /app/shakesearch ./shakesearch
 COPY --from=go-build /app/static ./static
 COPY --from=go-build /app/completeworks.txt ./completeworks.txt
 
-EXPOSE 3001
+ENV PORT=3002
 
 CMD ["sh", "-c", "./shakesearch & sleep 1 && npx mocha test.js"]
