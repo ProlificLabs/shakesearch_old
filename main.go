@@ -9,6 +9,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
+	"strings"
 )
 
 func main() {
@@ -48,7 +50,19 @@ func handleSearch(searcher Searcher) func(w http.ResponseWriter, r *http.Request
 			w.Write([]byte("missing search query in URL params"))
 			return
 		}
-		results := searcher.Search(query[0])
+
+		start := 0
+		if s, ok := r.URL.Query()["s"]; ok {
+			if parsed, err := strconv.Atoi(s[0]); err != nil {
+				w.WriteHeader(http.StatusBadRequest)
+				w.Write([]byte("invalid start position provided"))
+				return
+			} else {
+				start = parsed
+			}
+		}
+
+		results := searcher.Search(strings.ToLower(query[0]), start, 20)
 		buf := &bytes.Buffer{}
 		enc := json.NewEncoder(buf)
 		err := enc.Encode(results)
@@ -68,14 +82,17 @@ func (s *Searcher) Load(filename string) error {
 		return fmt.Errorf("Load: %w", err)
 	}
 	s.CompleteWorks = string(dat)
-	s.SuffixArray = suffixarray.New(dat)
+	s.SuffixArray = suffixarray.New(bytes.ToLower(dat))
 	return nil
 }
 
-func (s *Searcher) Search(query string) []string {
-	idxs := s.SuffixArray.Lookup([]byte(query), -1)
-	results := []string{}
-	for _, idx := range idxs {
+func (s *Searcher) Search(query string, start, count int) []string {
+	idxs := s.SuffixArray.Lookup([]byte(query), start+count)
+	results := make([]string, 0)
+	if len(idxs) < start {
+		return results
+	}
+	for _, idx := range idxs[start:] {
 		results = append(results, s.CompleteWorks[idx-250:idx+250])
 	}
 	return results
