@@ -13,10 +13,10 @@ Your task is to fix the underlying code to make the failing tests in the app pas
 ## Instructions
 
 1. Fork this repository.
-2. Fix the underlying code to make the tests pass.
-3. Open a pull request, which will run the tests through GitHub Actions. Ensure all tests pass.
-4. Include a short explanation of your changes in the pull request.
-5. Email us back with a link to the pull request.
+2. Turn on Github Actions (click Actions tab in Github and press "I understand my workflows, go ahead and enable them", free for public repos)
+3. Fix the underlying code to make the tests pass
+5. Include a short explanation of your changes in the readme or changelog file.
+6. Email us back with a link to your fork.
 
 ## Running the App Locally
 
