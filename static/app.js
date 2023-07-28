@@ -1,13 +1,28 @@
 const Controller = {
-  search: (ev) => {
+  numPages: 1,
+
+  handleSearch: (ev) => {
     ev.preventDefault();
+    Controller.numPages = 1;
+    Controller.fetchSearchResults();
+  },
+
+  loadMoreSearchResults: (ev) => {
+    ev.preventDefault();
+    Controller.numPages += 1;
+    Controller.fetchSearchResults();
+  },
+
+  fetchSearchResults: () => {
     const form = document.getElementById("form");
-    const data = Object.fromEntries(new FormData(form));
-    const response = fetch(`/search?q=${data.query}`).then((response) => {
-      response.json().then((results) => {
-        Controller.updateTable(results);
+    const { query } = Object.fromEntries(new FormData(form));
+    if (query) {
+      fetch(`/search?q=${query}&p=${Controller.numPages}`).then((response) => {
+        response.json().then((results) => {
+          Controller.updateTable(results);
+        });
       });
-    });
+    }
   },
 
   updateTable: (results) => {
@@ -21,4 +36,7 @@ const Controller = {
 };
 
 const form = document.getElementById("form");
-form.addEventListener("submit", Controller.search);
+form.addEventListener("submit", Controller.handleSearch);
+
+const loadMoreButton = document.getElementById("load-more");
+loadMoreButton.addEventListener("click", Controller.loadMoreSearchResults);

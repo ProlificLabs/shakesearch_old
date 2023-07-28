@@ -9,6 +9,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"regexp"
+	"strconv"
 )
 
 func main() {
@@ -42,13 +44,29 @@ type Searcher struct {
 
 func handleSearch(searcher Searcher) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		query, ok := r.URL.Query()["q"]
-		if !ok || len(query[0]) < 1 {
+		params := r.URL.Query()
+
+		query, ok := params["q"]
+		queryVal := query[0];
+		if !ok || len(queryVal) < 1 {
 			w.WriteHeader(http.StatusBadRequest)
 			w.Write([]byte("missing search query in URL params"))
 			return
 		}
-		results := searcher.Search(query[0])
+
+		pagesVal := 1
+		pages, ok := params["p"]
+		if ok && len(pages) > 0 {
+			parsedPagesVal, convErr := strconv.Atoi(pages[0])
+			if convErr != nil {
+				w.WriteHeader(http.StatusBadRequest)
+				w.Write([]byte("invalid search page value in URL params"))
+				return
+			}
+			pagesVal = parsedPagesVal;
+		}
+
+		results := searcher.Search(queryVal, pagesVal)
 		buf := &bytes.Buffer{}
 		enc := json.NewEncoder(buf)
 		err := enc.Encode(results)
@@ -72,11 +90,14 @@ func (s *Searcher) Load(filename string) error {
 	return nil
 }
 
-func (s *Searcher) Search(query string) []string {
-	idxs := s.SuffixArray.Lookup([]byte(query), -1)
+func (s *Searcher) Search(query string, pages int) []string {
+	caseInsensitiveQuery := regexp.MustCompile("(?i)" + query);
+	matches := s.SuffixArray.FindAllIndex(caseInsensitiveQuery, 20*pages)
 	results := []string{}
-	for _, idx := range idxs {
-		results = append(results, s.CompleteWorks[idx-250:idx+250])
+	for _, match := range matches {
+		lookBackIdx := match[0]-250
+		lookForwardIx := match[1]+250
+		results = append(results, s.CompleteWorks[lookBackIdx:lookForwardIx])
 	}
 	return results
 }
