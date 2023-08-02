@@ -9,6 +9,12 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
+	"strings"
+)
+
+const (
+	Limit = 20
 )
 
 func main() {
@@ -48,7 +54,9 @@ func handleSearch(searcher Searcher) func(w http.ResponseWriter, r *http.Request
 			w.Write([]byte("missing search query in URL params"))
 			return
 		}
-		results := searcher.Search(query[0])
+		page := page(r.URL.Query().Get("p"))
+
+		results := searcher.Search(query[0], page)
 		buf := &bytes.Buffer{}
 		enc := json.NewEncoder(buf)
 		err := enc.Encode(results)
@@ -68,15 +76,33 @@ func (s *Searcher) Load(filename string) error {
 		return fmt.Errorf("Load: %w", err)
 	}
 	s.CompleteWorks = string(dat)
-	s.SuffixArray = suffixarray.New(dat)
+	lowerWorks := strings.ToLower(s.CompleteWorks)
+	s.SuffixArray = suffixarray.New([]byte(lowerWorks))
 	return nil
 }
 
-func (s *Searcher) Search(query string) []string {
+func (s *Searcher) Search(query string, page int) []string {
+	query = strings.ToLower(query)
 	idxs := s.SuffixArray.Lookup([]byte(query), -1)
+	offset := page * Limit
+	if len(idxs) >= (offset + Limit) {
+		idxs = idxs[offset : offset+Limit]
+	} else if offset < len(idxs) {
+		idxs = idxs[offset:]
+	} else { // out of range, send empty
+		idxs = []int{}
+	}
 	results := []string{}
 	for _, idx := range idxs {
 		results = append(results, s.CompleteWorks[idx-250:idx+250])
 	}
 	return results
+}
+
+func page(s string) int {
+	if i, err := strconv.Atoi(s); err == nil {
+		return i
+	}
+	log.Printf("*> unexpected error occured when converting string %s to int on `page` sending zero\n", s)
+	return 0
 }
