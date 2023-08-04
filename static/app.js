@@ -1,9 +1,10 @@
 const Controller = {
+  initialPage: 1,
+
   search: (ev) => {
     ev.preventDefault();
-    const form = document.getElementById("form");
-    const data = Object.fromEntries(new FormData(form));
-    const response = fetch(`/search?q=${data.query}`).then((response) => {
+    const query = Controller.getQuery();
+    const response = fetch(`/search?q=${query}&pageSize=20&page=1`).then((response) => {
       response.json().then((results) => {
         Controller.updateTable(results);
       });
@@ -11,14 +12,33 @@ const Controller = {
   },
 
   updateTable: (results) => {
+    if (results.length === 0) return
     const table = document.getElementById("table-body");
-    const rows = [];
     for (let result of results) {
-      rows.push(`<tr><td>${result}</td></tr>`);
+      const newTaleRow = table.insertRow(-1);
+      const newCell = newTaleRow.insertCell(0);
+      newCell.innerText = result;
     }
-    table.innerHTML = rows;
   },
+
+  loadMore: (currentPage) => {
+    Controller.initialPage++;
+    const query = Controller.getQuery();
+    const response = fetch(`/search?q=${query}&pageSize=20&page=${Controller.initialPage}`).then((response) => {
+      response.json().then((results) => {
+        Controller.updateTable(results);
+      });
+    });
+  },
+
+  getQuery: () => {
+    const form = document.getElementById("form");
+    const data = Object.fromEntries(new FormData(form));
+    return data.query
+  }
 };
 
 const form = document.getElementById("form");
+const loadMore = document.getElementById("load-more");
 form.addEventListener("submit", Controller.search);
+loadMore.addEventListener("click", Controller.loadMore);

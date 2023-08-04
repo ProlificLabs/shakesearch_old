@@ -9,6 +9,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
+	"strings"
 )
 
 func main() {
@@ -48,10 +50,21 @@ func handleSearch(searcher Searcher) func(w http.ResponseWriter, r *http.Request
 			w.Write([]byte("missing search query in URL params"))
 			return
 		}
-		results := searcher.Search(query[0])
+
+		page, err := strconv.Atoi(r.URL.Query().Get("page"))
+		if err != nil {
+			page = 1
+		}
+
+		pageSize, err := strconv.Atoi(r.URL.Query().Get("pageSize"))
+		if err != nil {
+			pageSize = 20
+		}
+
+		results := searcher.Search(query[0], page, pageSize)
 		buf := &bytes.Buffer{}
 		enc := json.NewEncoder(buf)
-		err := enc.Encode(results)
+		err = enc.Encode(results)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte("encoding failure"))
@@ -67,15 +80,25 @@ func (s *Searcher) Load(filename string) error {
 	if err != nil {
 		return fmt.Errorf("Load: %w", err)
 	}
+	lowerCaseDat := strings.ToLower(string(dat))
 	s.CompleteWorks = string(dat)
-	s.SuffixArray = suffixarray.New(dat)
+	s.SuffixArray = suffixarray.New([]byte(lowerCaseDat))
 	return nil
 }
 
-func (s *Searcher) Search(query string) []string {
-	idxs := s.SuffixArray.Lookup([]byte(query), -1)
+func (s *Searcher) Search(query string, page int, pageSize int) []string {
+	lowerCaseQuery := strings.ToLower(query)
+	idxs := s.SuffixArray.Lookup([]byte(lowerCaseQuery), -1)
+	start := (page - 1) * pageSize
+	end := start + pageSize
+	if start > len(idxs) {
+		return []string{}
+	}
+	if end > len(idxs) {
+		end = len(idxs)
+	}
 	results := []string{}
-	for _, idx := range idxs {
+	for _, idx := range idxs[start:end] {
 		results = append(results, s.CompleteWorks[idx-250:idx+250])
 	}
 	return results
