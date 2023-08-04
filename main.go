@@ -74,37 +74,28 @@ func (s *Searcher) Load(filename string) error {
     return nil
 }
 
-func (s *Searcher) Search(query string, offset int) []string {
+func (s *Searcher) Search(query string, start int) []string {
 	limit := 20
 	query = strings.ToLower(query)
 	idxs := s.SuffixArray.Lookup([]byte(query), -1)
 
 	// Check if offset is beyond the length of idxs
-	if offset >= len(idxs) {
+	if start >= len(idxs) {
 		return []string{}
 	}
 
 	// Calculate end index based on limit
-	end := offset + limit
+	end := start + limit
 	if end > len(idxs) {
 		end = len(idxs)
 	}
 
 	// Slice idxs based on offset and limit
-	idxs = idxs[offset:end]
+	idxs = idxs[start:end]
 
 	results := []string{}
 	for _, idx := range idxs {
-		start := idx - 250
-		end := idx + 250
-
-		if start < 0 {
-			start = 0
-		}
-		if end > len(s.CompleteWorks) {
-			end = len(s.CompleteWorks)
-		}
-		results = append(results, s.CompleteWorks[start:end])
+		results = append(results, s.CompleteWorks[idx - 250:idx + 250])
 	}
 	return results
 }
