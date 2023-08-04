@@ -61,7 +61,6 @@ describe('ShakeSearch', () => {
     const initialResults = await page.evaluate(() => {
       const rows = document.querySelectorAll('#table-body tr');
         return Array.from(rows, row => row.textContent.trim());
-
     });
 
     await page.click('#load-more');
@@ -70,7 +69,6 @@ describe('ShakeSearch', () => {
     const updatedResults = await page.evaluate(() => {
       const rows = document.querySelectorAll('#table-body tr');
         return Array.from(rows, row => row.textContent.trim());
-
     });
 
     assert.isAbove(updatedResults.length, initialResults.length, 'More results should be added to the results table');
