@@ -5,10 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"index/suffixarray"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+	"strings"
 )
 
 func main() {
@@ -63,20 +63,31 @@ func handleSearch(searcher Searcher) func(w http.ResponseWriter, r *http.Request
 }
 
 func (s *Searcher) Load(filename string) error {
-	dat, err := ioutil.ReadFile(filename)
-	if err != nil {
-		return fmt.Errorf("Load: %w", err)
-	}
-	s.CompleteWorks = string(dat)
-	s.SuffixArray = suffixarray.New(dat)
-	return nil
+    dat, err := os.ReadFile(filename)
+    if err != nil {
+        return fmt.Errorf("Load: %w", err)
+    }
+    lowerData := strings.ToLower(string(dat))
+    s.CompleteWorks = lowerData
+    s.SuffixArray = suffixarray.New([]byte(lowerData))
+    return nil
 }
 
 func (s *Searcher) Search(query string) []string {
+	query = strings.ToLower(query)
 	idxs := s.SuffixArray.Lookup([]byte(query), -1)
 	results := []string{}
 	for _, idx := range idxs {
-		results = append(results, s.CompleteWorks[idx-250:idx+250])
+		start := idx - 250
+		end := idx + 250
+
+		if start < 0 {
+			start = 0
+		}
+		if end > len(s.CompleteWorks) {
+			end = len(s.CompleteWorks)
+		}
+		results = append(results, s.CompleteWorks[start:end])
 	}
 	return results
 }
