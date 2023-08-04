@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -48,7 +49,8 @@ func handleSearch(searcher Searcher) func(w http.ResponseWriter, r *http.Request
 			w.Write([]byte("missing search query in URL params"))
 			return
 		}
-		results := searcher.Search(query[0])
+		offset, _ := strconv.Atoi(r.URL.Query().Get("offset"))
+		results := searcher.Search(query[0], offset)
 		buf := &bytes.Buffer{}
 		enc := json.NewEncoder(buf)
 		err := enc.Encode(results)
@@ -67,15 +69,30 @@ func (s *Searcher) Load(filename string) error {
     if err != nil {
         return fmt.Errorf("Load: %w", err)
     }
-    lowerData := strings.ToLower(string(dat))
-    s.CompleteWorks = lowerData
-    s.SuffixArray = suffixarray.New([]byte(lowerData))
+    s.CompleteWorks = string(dat)
+    s.SuffixArray = suffixarray.New([]byte(strings.ToLower(string(dat))))
     return nil
 }
 
-func (s *Searcher) Search(query string) []string {
+func (s *Searcher) Search(query string, offset int) []string {
+	limit := 20
 	query = strings.ToLower(query)
 	idxs := s.SuffixArray.Lookup([]byte(query), -1)
+
+	// Check if offset is beyond the length of idxs
+	if offset >= len(idxs) {
+		return []string{}
+	}
+
+	// Calculate end index based on limit
+	end := offset + limit
+	if end > len(idxs) {
+		end = len(idxs)
+	}
+
+	// Slice idxs based on offset and limit
+	idxs = idxs[offset:end]
+
 	results := []string{}
 	for _, idx := range idxs {
 		start := idx - 250
